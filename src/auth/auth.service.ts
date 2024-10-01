@@ -67,13 +67,11 @@ export class AuthService {
         secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
       });
       let user = await this.usersService.findUserByToken(refreshToken);
+
       if (user) {
-        const { _id, name, email } = user;
+        const { _id, email } = user;
         const payload = {
-          sub: 'token refresh',
-          iss: 'from server',
           _id,
-          name,
           email,
         };
 
@@ -86,18 +84,18 @@ export class AuthService {
           access_token: this.jwtService.sign(payload),
           user: {
             _id,
-            name,
             email,
           },
         };
       } else {
         throw new BadRequestException(
-          `Refresh token không hợp lệ. Vui lòng login.`,
+          `Refresh token không hợp lệ. Vui lòng login. `,
         );
       }
     } catch (error) {
+      console.log(error);
       throw new BadRequestException(
-        `Refresh token không hợp lệ. Vui lòng login.`,
+        `Refresh token không hợp lệ. Vui lòng login `,
       );
     }
   };

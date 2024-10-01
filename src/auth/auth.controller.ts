@@ -37,8 +37,8 @@ export class AuthController {
   }
 
   @Public()
-  @Get('/refresh')
-  handleRefreshToken(@Body() refreshToken: string) {
-    return this.authService.processNewToken(refreshToken);
+  @Post('/refresh')
+  handleRefreshToken(@Body() body: { refreshToken: string }) {
+    return this.authService.processNewToken(body.refreshToken);
   }
 }

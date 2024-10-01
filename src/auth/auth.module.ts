@@ -12,18 +12,18 @@ import { JwtStrategy } from './passport/jwt.strategy';
 @Module({
   imports: [
     UsersModule,
-    PassportModule, 
+    PassportModule,
     JwtModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
-        global:true,
+        global: true,
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {expiresIn: '12h'}
+        signOptions: { expiresIn: '2h' },
       }),
-      inject: [ConfigService]
-    })
+      inject: [ConfigService],
+    }),
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],
-  exports: [AuthService]
+  exports: [AuthService],
 })
 export class AuthModule {}
