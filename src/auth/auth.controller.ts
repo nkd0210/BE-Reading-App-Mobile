@@ -16,6 +16,7 @@ import { LocalAuthGuard } from './passport/local-auth.guard';
 import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
 import { JwtAuthGuard } from './passport/jwt-auth.guard';
+import { FacebookGuard } from './passport/facebook.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -48,5 +49,22 @@ export class AuthController {
   async logout(@Request() req) {
     const userId = req.user._id;
     return await this.authService.logout(userId);
+  }
+
+  @UseGuards(FacebookGuard)
+  @Public()
+  @Get('/facebook')
+  async facebookLogin(): Promise<any> {
+    return 'login succesfully';
+  }
+
+  @UseGuards(FacebookGuard)
+  @Public()
+  @Get('/facebook/callback')
+  async facebookLoginCallback(@Request() req): Promise<any> {
+    return {
+      message: 'Facebook login successful',
+      user: req.user,
+    };
   }
 }
