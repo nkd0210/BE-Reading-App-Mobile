@@ -15,6 +15,7 @@ import { Public } from 'src/decorator/customize';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
+import { JwtAuthGuard } from './passport/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -40,5 +41,12 @@ export class AuthController {
   @Post('/refresh')
   handleRefreshToken(@Body() body: { refreshToken: string }) {
     return this.authService.processNewToken(body.refreshToken);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/logout')
+  async logout(@Request() req) {
+    const userId = req.user._id;
+    return await this.authService.logout(userId);
   }
 }

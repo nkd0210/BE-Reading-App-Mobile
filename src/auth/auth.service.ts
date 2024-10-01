@@ -82,6 +82,7 @@ export class AuthService {
 
         return {
           access_token: this.jwtService.sign(payload),
+          refresh_token,
           user: {
             _id,
             email,
@@ -99,4 +100,8 @@ export class AuthService {
       );
     }
   };
+
+  async logout(userId: string) {
+    await this.usersService.invalidateUserToken(userId);
+  }
 }
