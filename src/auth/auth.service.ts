@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
 import { comparePasswordUtils } from 'src/utils/util';
 import { JwtService } from '@nestjs/jwt';
@@ -54,5 +59,46 @@ export class AuthService {
       expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRE'),
     });
     return refresh_token;
+  };
+
+  processNewToken = async (refreshToken: string) => {
+    try {
+      this.jwtService.verify(refreshToken, {
+        secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+      });
+      let user = await this.usersService.findUserByToken(refreshToken);
+      if (user) {
+        const { _id, name, email } = user;
+        const payload = {
+          sub: 'token refresh',
+          iss: 'from server',
+          _id,
+          name,
+          email,
+        };
+
+        const refresh_token = this.createRefreshToken(payload);
+
+        //update user with refresh token
+        await this.usersService.updateUserToken(refresh_token, _id.toString());
+
+        return {
+          access_token: this.jwtService.sign(payload),
+          user: {
+            _id,
+            name,
+            email,
+          },
+        };
+      } else {
+        throw new BadRequestException(
+          `Refresh token không hợp lệ. Vui lòng login.`,
+        );
+      }
+    } catch (error) {
+      throw new BadRequestException(
+        `Refresh token không hợp lệ. Vui lòng login.`,
+      );
+    }
   };
 }
