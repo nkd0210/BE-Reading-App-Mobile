@@ -43,13 +43,16 @@ export class AuthService {
       sub: user._id,
     };
 
-    const refresh_token = this.createRefreshToken(payload);
+    const refresh_token = await this.createRefreshToken(payload);
+
+    const userProfile = await this.usersService.getUserProfile(user.email);
 
     await this.usersService.updateUserToken(refresh_token, user._id);
 
     return {
       access_token: this.jwtService.sign(payload),
       refresh_token,
+      userProfile,
     };
   }
 

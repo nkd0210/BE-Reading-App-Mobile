@@ -50,6 +50,20 @@ export class UsersService {
     return findUser;
   }
 
+  // userProfile
+  async getUserProfile(email: string): Promise<User> {
+    const findUser = await this.userModel.findOne(
+      { email },
+      { password: 0, refreshToken: 0 }, // Exclude both password and refreshToken
+    ); // Exclude password
+
+    if (!findUser) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    return findUser;
+  }
+
   // tìm user bằng id
   async getUserById(userId: string): Promise<User> {
     const findUser = await this.userModel
