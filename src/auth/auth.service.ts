@@ -77,6 +77,7 @@ export class AuthService {
           _id,
           email,
         };
+        const userProfile = await this.usersService.getUserProfile(user.email);
 
         const refresh_token = this.createRefreshToken(payload);
 
@@ -86,10 +87,7 @@ export class AuthService {
         return {
           access_token: this.jwtService.sign(payload),
           refresh_token,
-          user: {
-            _id,
-            email,
-          },
+          userProfile,
         };
       } else {
         throw new BadRequestException(
