@@ -105,4 +105,24 @@ export class AuthService {
   async logout(userId: string) {
     await this.usersService.invalidateUserToken(userId);
   }
+
+  async handleFacebookLogin(facebookId: string): Promise<any> {
+    let user = await this.usersService.findUserByFacebookId(facebookId);
+
+    if (!user) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'User not found',
+          facebookId: facebookId,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return {
+      message: 'Facebook login successful',
+      user,
+    };
+  }
 }

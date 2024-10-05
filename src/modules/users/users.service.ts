@@ -182,4 +182,8 @@ export class UsersService {
       { $set: { refreshToken: null } },
     );
   };
+
+  async findUserByFacebookId(facebookId: string) {
+    return this.userModel.findOne({ facebookId });
+  }
 }

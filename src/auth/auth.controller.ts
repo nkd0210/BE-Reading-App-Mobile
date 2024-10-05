@@ -62,9 +62,7 @@ export class AuthController {
   @Public()
   @Get('/facebook/callback')
   async facebookLoginCallback(@Request() req): Promise<any> {
-    return {
-      message: 'Facebook login successful',
-      user: req.user,
-    };
+    const facebookId = req.user.id;
+    return this.authService.handleFacebookLogin(facebookId);
   }
 }

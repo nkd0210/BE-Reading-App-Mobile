@@ -26,6 +26,12 @@ export class User {
   address: string;
 
   @Prop()
+  facebookId: string;
+
+  @Prop()
+  gooogleId: string;
+
+  @Prop()
   image: string;
 
   @Prop({ default: 'User' })
