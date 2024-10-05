@@ -17,6 +17,7 @@ import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
 import { JwtAuthGuard } from './passport/jwt-auth.guard';
 import { FacebookGuard } from './passport/facebook.guard';
+import { GoogleGuard } from './passport/google.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -64,5 +65,17 @@ export class AuthController {
   async facebookLoginCallback(@Request() req): Promise<any> {
     const facebookId = req.user.id;
     return this.authService.handleFacebookLogin(facebookId);
+  }
+
+  @UseGuards(GoogleGuard)
+  @Public()
+  @Get('/gooogle')
+  async googleAuth(@Request() req) {}
+
+  @UseGuards(GoogleGuard)
+  @Public()
+  @Get('/redirect')
+  googleAuthRedirect(@Request() req) {
+    return this.authService.handleGoogleLogin(req);
   }
 }
