@@ -76,6 +76,7 @@ export class AuthController {
   @Public()
   @Get('/google/redirect')
   googleAuthRedirect(@Request() req) {
-    return this.authService.handleGoogleLogin(req);
+    const googleId = req.user.id;
+    return this.authService.handleGoogleLogin(googleId);
   }
 }

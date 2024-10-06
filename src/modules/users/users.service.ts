@@ -186,4 +186,8 @@ export class UsersService {
   async findUserByFacebookId(facebookId: string) {
     return this.userModel.findOne({ facebookId });
   }
+
+  async findUserByGoogleId(googleId: string) {
+    return this.userModel.findOne({ googleId });
+  }
 }

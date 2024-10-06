@@ -29,7 +29,7 @@ export class User {
   facebookId: string;
 
   @Prop()
-  gooogleId: string;
+  googleId: string;
 
   @Prop()
   image: string;

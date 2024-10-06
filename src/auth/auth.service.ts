@@ -112,11 +112,11 @@ export class AuthService {
     if (!user) {
       throw new HttpException(
         {
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          statusCode: 206,
           message: 'User not found',
           facebookId: facebookId,
         },
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        206,
       );
     }
 
@@ -126,14 +126,23 @@ export class AuthService {
     };
   }
 
-  handleGoogleLogin(req) {
-    if (!req.user) {
-      return 'No user from google';
+  async handleGoogleLogin(googleId: string) {
+    let user = await this.usersService.findUserByGoogleId(googleId);
+
+    if (!user) {
+      throw new HttpException(
+        {
+          statusCode: 206,
+          message: 'User not found',
+          googleId: googleId,
+        },
+        206,
+      );
     }
 
     return {
-      message: 'User information from google',
-      user: req.user,
+      message: 'Google login successful',
+      user,
     };
   }
 }
