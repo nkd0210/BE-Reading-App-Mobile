@@ -7,53 +7,68 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
 export class User {
-    @Prop({ required: true })
-    name: string;
+  @Prop({ required: true })
+  name: string;
 
-    @Prop({ unique: true, required: true })
-    email: string;
+  @Prop({ unique: true, required: true })
+  email: string;
 
-    @Prop({ required: true })
-    password: string;
+  @Prop({ required: true })
+  password: string;
 
-    @Prop()
-    phone: string;
+  @Prop()
+  phone: string;
 
-    @Prop()
-    address: string;
+  @Prop()
+  refreshToken: string;
 
-    @Prop()
-    image: string;
+  @Prop()
+  address: string;
 
-    @Prop({ default: "User" })
-    role: string;
+  @Prop()
+  facebookId: string;
 
-    @Prop()
-    isActive: boolean;
+  @Prop()
+  googleId: string;
 
-    @Prop({
-        type: [{
-            type: mongoose.Schema.Types.ObjectId, ref: 'Book'
-        }]
-    })
-    favourites: Types.ObjectId[];
+  @Prop()
+  image: string;
 
-    @Prop({
-        type: [{
-            type: mongoose.Schema.Types.ObjectId, ref: 'Book'
-        }]
-    })
-    readingList: Types.ObjectId[];
+  @Prop({ default: 'User' })
+  role: string;
 
-    @Prop({
-        type: [{
-            type: mongoose.Schema.Types.ObjectId, ref: 'ReadingProgress'
-        }]
-    })
-    readingProgress: ReadingProgress[];
+  @Prop()
+  isActive: boolean;
 
+  @Prop({
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Book',
+      },
+    ],
+  })
+  favourites: Types.ObjectId[];
+
+  @Prop({
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Book',
+      },
+    ],
+  })
+  readingList: Types.ObjectId[];
+
+  @Prop({
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ReadingProgress',
+      },
+    ],
+  })
+  readingProgress: ReadingProgress[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-
-

@@ -10,8 +10,8 @@ import { hashPasswordUtils } from 'src/utils/util';
 export class UsersService {
   constructor(
     @InjectModel(User.name)
-    private userModel: Model<User>
-  ) { }
+    private userModel: Model<User>,
+  ) {}
 
   // tạo user dùng trong lúc sign up trong folder auth
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -19,7 +19,7 @@ export class UsersService {
 
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {
-      throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
     }
 
     const hashedPassword = await hashPasswordUtils(password);
@@ -33,8 +33,8 @@ export class UsersService {
       image,
       favourites: [],
       readingList: [],
-      readingProgress: []
-    })
+      readingProgress: [],
+    });
 
     return newUser;
   }
@@ -44,7 +44,21 @@ export class UsersService {
     const findUser = await this.userModel.findOne({ email });
 
     if (!findUser) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    return findUser;
+  }
+
+  // userProfile
+  async getUserProfile(email: string): Promise<User> {
+    const findUser = await this.userModel.findOne(
+      { email },
+      { password: 0, refreshToken: 0 }, // Exclude both password and refreshToken
+    ); // Exclude password
+
+    if (!findUser) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
     return findUser;
@@ -52,17 +66,18 @@ export class UsersService {
 
   // tìm user bằng id
   async getUserById(userId: string): Promise<User> {
-    const findUser = await this.userModel.findById(userId)
+    const findUser = await this.userModel
+      .findById(userId)
       .populate('favourites readingList')
       .populate({
         path: 'readingProgress',
         populate: {
           path: 'book currentChapter',
-        }
-      })
+        },
+      });
 
     if (!findUser) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
     return findUser;
@@ -72,24 +87,25 @@ export class UsersService {
   async getAllUsers(page: number, limit: number): Promise<any> {
     const skip = (page - 1) * limit;
 
-    const allUsers = await this.userModel.find()
+    const allUsers = await this.userModel
+      .find()
       .skip(skip)
       .limit(limit)
-      .select("-password")
+      .select('-password');
 
     const totalUsers = await this.userModel.countDocuments();
     const totalPages = Math.ceil(totalUsers / limit);
 
     if (allUsers.length === 0) {
-      throw new HttpException('No users found', HttpStatus.NOT_FOUND)
+      throw new HttpException('No users found', HttpStatus.NOT_FOUND);
     }
 
     return {
       totalUsers,
       page,
       totalPages,
-      allUsers
-    }
+      allUsers,
+    };
   }
 
   // cập nhật user
@@ -97,14 +113,17 @@ export class UsersService {
     const findUser = await this.userModel.findById(userId);
 
     if (!findUser) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
     const { name, email, password, phone, address, image } = updateUserDto;
 
     if (password) {
       if (password.length < 6) {
-        throw new HttpException('Password must be at least 6 characters long', HttpStatus.BAD_REQUEST)
+        throw new HttpException(
+          'Password must be at least 6 characters long',
+          HttpStatus.BAD_REQUEST,
+        );
       }
       updateUserDto.password = await hashPasswordUtils(password);
     }
@@ -119,15 +138,18 @@ export class UsersService {
             password: updateUserDto.password,
             phone,
             address,
-            image
-          }
+            image,
+          },
         },
-        { new: true }
-      )
+        { new: true },
+      );
       const { password, ...rest } = updatedUser.toObject();
       return rest;
     } catch (error) {
-      throw new HttpException("Update user failed", HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        'Update user failed',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -136,12 +158,36 @@ export class UsersService {
     try {
       await this.userModel.findByIdAndDelete(userId);
       return {
-        message: "User deleted successfully"
+        message: 'User deleted successfully',
       };
     } catch (error) {
-      throw new HttpException("Delete user failed", HttpStatus.INTERNAL_SERVER_ERROR)
-
+      throw new HttpException(
+        'Delete user failed',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
+  updateUserToken = async (refreshToken: string, _id: string) => {
+    return await this.userModel.updateOne({ _id }, { refreshToken });
+  };
+
+  findUserByToken = async (refreshToken: string) => {
+    return await this.userModel.findOne({ refreshToken });
+  };
+
+  invalidateUserToken = async (userId: string) => {
+    const result = await this.userModel.updateOne(
+      { _id: userId },
+      { $set: { refreshToken: null } },
+    );
+  };
+
+  async findUserByFacebookId(facebookId: string) {
+    return this.userModel.findOne({ facebookId });
+  }
+
+  async findUserByGoogleId(googleId: string) {
+    return this.userModel.findOne({ googleId });
+  }
 }
