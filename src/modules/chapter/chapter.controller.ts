@@ -1,17 +1,31 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Put,
+  Query,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { ChapterService } from './chapter.service';
 import { CreateChapterDto } from './dto/create-chapter.dto';
 import { UpdateChapterDto } from './dto/update-chapter.dto';
 import { Chapter } from './entities/chapter.entity';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('chapter')
 @Controller('chapter')
 export class ChapterController {
-  constructor(private readonly chapterService: ChapterService) { }
+  constructor(private readonly chapterService: ChapterService) {}
 
   @Post('/createChapter/:bookId')
   createChapter(
     @Param('bookId') bookId: string,
-    @Body() createChapterDto: CreateChapterDto
+    @Body() createChapterDto: CreateChapterDto,
   ): Promise<Chapter> {
     return this.chapterService.createChapter(bookId, createChapterDto);
   }
@@ -20,15 +34,13 @@ export class ChapterController {
   getAllChaptersOfBook(
     @Param('bookId') bookId: string,
     @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10
+    @Query('limit') limit: number = 10,
   ): Promise<any> {
     return this.chapterService.getAllChaptersOfBook(bookId, page, limit);
   }
 
   @Get('/getSingleChapter/:chapterId')
-  getSingleChapter(
-    @Param('chapterId') chapterId: string
-  ): Promise<Chapter> {
+  getSingleChapter(@Param('chapterId') chapterId: string): Promise<Chapter> {
     return this.chapterService.getSingleChapter(chapterId);
   }
 
@@ -36,11 +48,11 @@ export class ChapterController {
   @Get('/getChapter/:chapterId')
   getChapter(
     @Param('chapterId') chapterId: string,
-    @Query('page') page:string
-  ):Promise<any> {
+    @Query('page') page: string,
+  ): Promise<any> {
     const pageNumber = parseInt(page, 10) || 1;
 
-    if(pageNumber < 1) {
+    if (pageNumber < 1) {
       throw new HttpException('Invalid page number', HttpStatus.BAD_REQUEST);
     }
 
@@ -51,16 +63,17 @@ export class ChapterController {
   updateChapter(
     @Param('bookId') bookId: string,
     @Param('chapterId') chapterId: string,
-    @Body() updateChapterDto: UpdateChapterDto
+    @Body() updateChapterDto: UpdateChapterDto,
   ): Promise<Chapter> {
-    return this.chapterService.updateChapter(bookId, chapterId, updateChapterDto);
+    return this.chapterService.updateChapter(
+      bookId,
+      chapterId,
+      updateChapterDto,
+    );
   }
 
   @Delete('/deleteChapter/:chapterId')
-  deleteChapter(
-    @Param('chapterId') chapterId: string
-  ): Promise<any> {
+  deleteChapter(@Param('chapterId') chapterId: string): Promise<any> {
     return this.chapterService.deleteChapter(chapterId);
   }
-
 }

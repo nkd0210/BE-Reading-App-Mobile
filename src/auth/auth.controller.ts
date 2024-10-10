@@ -18,7 +18,7 @@ import { User } from 'src/modules/users/entities/user.entity';
 import { JwtAuthGuard } from './passport/jwt-auth.guard';
 import { FacebookGuard } from './passport/facebook.guard';
 import { GoogleGuard } from './passport/google.guard';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -37,6 +37,15 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Public()
   @Post('/signin')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        username: { type: 'string', example: 'kdung@gmail.com' },
+        password: { type: 'string', example: '123456' },
+      },
+    },
+  })
   signIn(@Request() req): any {
     return this.authService.login(req.user);
   }

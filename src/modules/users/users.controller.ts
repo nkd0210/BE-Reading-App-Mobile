@@ -1,18 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+  Put,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { Public } from 'src/decorator/customize';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('user')
 @Controller('user')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Get('/getUserById/:userId')
-  getUserById(
-    @Param('userId') userId: string
-  ): Promise<User> {
+  getUserById(@Param('userId') userId: string): Promise<User> {
     return this.usersService.getUserById(userId);
   }
 
@@ -20,7 +31,7 @@ export class UsersController {
   @Get('getAllUsers')
   getAllUsers(
     @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10
+    @Query('limit') limit: number = 10,
   ): Promise<any> {
     return this.usersService.getAllUsers(page, limit);
   }
@@ -28,15 +39,13 @@ export class UsersController {
   @Put('/updateUser/:userId')
   updateUser(
     @Param('userId') userId: string,
-    @Body() updateUserDto: UpdateUserDto
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<any> {
     return this.usersService.updateUser(userId, updateUserDto);
   }
 
   @Delete('/deleteUser/:userId')
-  deleteUser(
-    @Param('userId') userId: string
-  ): Promise<any> {
+  deleteUser(@Param('userId') userId: string): Promise<any> {
     return this.usersService.deleteUser(userId);
   }
 }
