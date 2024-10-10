@@ -68,7 +68,6 @@ export class ReadingProgressService {
     );
 
     return {
-      user: findUser,
       totalIncompleteReadingProgress,
       page,
       totalPages,
