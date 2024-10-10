@@ -40,6 +40,14 @@ export class BookController {
     return this.bookService.getAllCompletedBooks(page, limit);
   }
 
+  @Get('getAllCompletedBooks')
+  getAllTrendingBooks(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<any> {
+    return this.bookService.getAllTrendingBooks(page, limit);
+  }
+
   @Get('/getSingleBook/:bookId')
   getSingleBook(@Param('bookId') bookId: string): Promise<Book> {
     return this.bookService.getSingleBook(bookId);

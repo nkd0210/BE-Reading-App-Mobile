@@ -109,6 +109,39 @@ export class BookService {
     };
   }
 
+  async getAllTrendingBooks(page: number, limit: number): Promise<any> {
+    const skip = (page - 1) * limit;
+
+    // Query for books sorted by views in descending order
+    const trendingBooks = await this.bookModel
+      .find()
+      .sort({ views: -1 }) // Sort by views in descending order
+      .skip(skip)
+      .limit(limit)
+      .populate('tags')
+      .populate({
+        path: 'chapters',
+        options: {
+          sort: { chapterNumber: 1 },
+        },
+      })
+      .exec();
+
+    const totalTrendingBooks = await this.bookModel.countDocuments();
+    const totalPages = Math.ceil(totalTrendingBooks / limit);
+
+    if (trendingBooks.length === 0) {
+      throw new HttpException('No trending books found', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      totalTrendingBooks,
+      page,
+      totalPages,
+      trendingBooks,
+    };
+  }
+
   // lấy từng sách
   async getSingleBook(bookId: string): Promise<Book> {
     const findBook = await this.bookModel
