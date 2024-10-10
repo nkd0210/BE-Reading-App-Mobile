@@ -4,31 +4,33 @@ import { Types } from 'mongoose';
 import { IsOptional } from 'class-validator';
 
 export class UpdateBookDto extends PartialType(CreateBookDto) {
+  @IsOptional()
+  title: string;
 
-    @IsOptional()
-    title: string;
-    
-    @IsOptional()
-    author: string;
+  @IsOptional()
+  author: string;
 
-    @IsOptional()
-    tags: string[];
+  @IsOptional()
+  tags: string[];
 
-    @IsOptional()
-    plot: string;
+  @IsOptional()
+  plot: string;
 
-    @IsOptional()
-    views: number;
+  @IsOptional()
+  views: number;
 
-    @IsOptional()
-    totalVotes: number;
+  @IsOptional()
+  totalVotes: number;
 
-    @IsOptional()
-    positiveVotes: number;
+  @IsOptional()
+  positiveVotes: number;
 
-    @IsOptional()
-    coverImage: string;
+  @IsOptional()
+  coverImage: string;
 
-    @IsOptional()
-    chapters: string[];
+  @IsOptional()
+  chapters: string[];
+
+  @IsOptional()
+  isCompleted: boolean;
 }

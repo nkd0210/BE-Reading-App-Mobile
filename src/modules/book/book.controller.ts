@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  Put,
+} from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
@@ -7,49 +17,51 @@ import { Types } from 'mongoose';
 
 @Controller('book')
 export class BookController {
-  constructor(private readonly bookService: BookService) { }
+  constructor(private readonly bookService: BookService) {}
 
   @Post('/createBook')
-  createBook(
-    @Body() createBookDto: CreateBookDto
-  ): Promise<Book> {
+  createBook(@Body() createBookDto: CreateBookDto): Promise<Book> {
     return this.bookService.createBook(createBookDto);
   }
 
   @Get('getAllBooks')
   getAllBooks(
     @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10
+    @Query('limit') limit: number = 10,
   ): Promise<any> {
     return this.bookService.getAllBooks(page, limit);
   }
 
+  @Get('getAllCompletedBooks')
+  getAllCompletedBooks(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<any> {
+    return this.bookService.getAllCompletedBooks(page, limit);
+  }
+
   @Get('/getSingleBook/:bookId')
-  getSingleBook(
-    @Param('bookId') bookId: string
-  ): Promise<Book> {
+  getSingleBook(@Param('bookId') bookId: string): Promise<Book> {
     return this.bookService.getSingleBook(bookId);
   }
 
   @Put('/updateBook/:bookId')
   updateBook(
     @Param('bookId') bookId: string,
-    @Body() updateBookDto: UpdateBookDto
+    @Body() updateBookDto: UpdateBookDto,
   ): Promise<Book> {
     return this.bookService.updateBook(bookId, updateBookDto);
   }
 
   @Delete('/deleteBook/:bookId')
-  deleteBook(
-    @Param('bookId') bookId: string
-  ): Promise<any> {
+  deleteBook(@Param('bookId') bookId: string): Promise<any> {
     return this.bookService.deleteBook(bookId);
   }
 
   @Put('/addToFavorites/:userId/:bookId')
   addToFavorites(
     @Param('userId') userId: string,
-    @Param('bookId') bookId: string
+    @Param('bookId') bookId: string,
   ): Promise<any> {
     return this.bookService.addToFavorites(userId, bookId);
   }
@@ -57,7 +69,7 @@ export class BookController {
   @Put('/removeFromFavorites/:userId/:bookId')
   removeFromFavorites(
     @Param('userId') userId: string,
-    @Param('bookId') bookId: string
+    @Param('bookId') bookId: string,
   ): Promise<any> {
     return this.bookService.removeFromFavorites(userId, bookId);
   }
@@ -65,7 +77,7 @@ export class BookController {
   @Put('/addToReadingList/:userId/:bookId')
   addToReadingList(
     @Param('userId') userId: string,
-    @Param('bookId') bookId: string
+    @Param('bookId') bookId: string,
   ): Promise<any> {
     return this.bookService.addToReadingList(userId, bookId);
   }
@@ -73,9 +85,8 @@ export class BookController {
   @Put('/removeFromReadingList/:userId/:bookId')
   removeFromReadingList(
     @Param('userId') userId: string,
-    @Param('bookId') bookId: string
+    @Param('bookId') bookId: string,
   ): Promise<any> {
     return this.bookService.removeFromReadingList(userId, bookId);
   }
-
 }

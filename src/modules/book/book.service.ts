@@ -12,17 +12,20 @@ export class BookService {
   constructor(
     @InjectModel(Book.name) private bookModel: Model<Book>,
     @InjectModel(Genre.name) private genreModel: Model<Genre>,
-    @InjectModel(User.name) private userModel: Model<User>
-  ) { }
+    @InjectModel(User.name) private userModel: Model<User>,
+  ) {}
 
-  // tạo sách 
+  // tạo sách
   async createBook(createBookDto: CreateBookDto): Promise<Book> {
     const { title, author, plot, coverImage } = createBookDto;
 
     const findSameBookTitle = await this.bookModel.findOne({ title });
 
     if (findSameBookTitle) {
-      throw new HttpException("Book title already exist", HttpStatus.BAD_REQUEST)
+      throw new HttpException(
+        'Book title already exist',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const newBook = await this.bookModel.create({
@@ -35,7 +38,7 @@ export class BookService {
       totalVotes: 0,
       positiveVote: 0,
       chapters: [],
-    })
+    });
 
     return newBook;
   }
@@ -44,15 +47,16 @@ export class BookService {
   async getAllBooks(page: number, limit: number): Promise<any> {
     const skip = (page - 1) * limit;
 
-    const allBooks = await this.bookModel.find()
+    const allBooks = await this.bookModel
+      .find()
       .skip(skip)
       .limit(limit)
       .populate('tags')
       .populate({
         path: 'chapters',
         options: {
-          sort: { chapterNumber: 1 }
-        }
+          sort: { chapterNumber: 1 },
+        },
       })
       .exec();
 
@@ -60,38 +64,86 @@ export class BookService {
     const totalPages = Math.ceil(totalBooks / limit);
 
     if (allBooks.length === 0) {
-      throw new HttpException('No books found', HttpStatus.NOT_FOUND)
+      throw new HttpException('No books found', HttpStatus.NOT_FOUND);
     }
 
     return {
       totalBooks,
       page,
       totalPages,
-      allBooks
+      allBooks,
+    };
+  }
+
+  async getAllCompletedBooks(page: number, limit: number): Promise<any> {
+    const skip = (page - 1) * limit;
+
+    // Query for books with isCompleted set to true
+    const completedBooks = await this.bookModel
+      .find({ isCompleted: true })
+      .skip(skip)
+      .limit(limit)
+      .populate('tags')
+      .populate({
+        path: 'chapters',
+        options: {
+          sort: { chapterNumber: 1 },
+        },
+      })
+      .exec();
+
+    const totalCompletedBooks = await this.bookModel.countDocuments({
+      isCompleted: true,
+    });
+    const totalPages = Math.ceil(totalCompletedBooks / limit);
+
+    if (completedBooks.length === 0) {
+      throw new HttpException('No completed books found', HttpStatus.NOT_FOUND);
     }
+
+    return {
+      totalCompletedBooks,
+      page,
+      totalPages,
+      completedBooks,
+    };
   }
 
   // lấy từng sách
   async getSingleBook(bookId: string): Promise<Book> {
-    const findBook = await this.bookModel.findById(bookId)
+    const findBook = await this.bookModel
+      .findById(bookId)
       .populate({
         path: 'chapters',
         options: {
-          sort: { chapterNumber: 1 }
-        }
+          sort: { chapterNumber: 1 },
+        },
       })
       .populate('tags')
       .exec();
     if (!findBook) {
-      throw new HttpException('Book not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
     }
 
     return findBook;
   }
 
   // cập nhật sách
-  async updateBook(bookId: string, updateBookDto: UpdateBookDto): Promise<Book> {
-    const { title, author, tags, plot, views, totalVotes, positiveVotes, coverImage, chapters } = updateBookDto;
+  async updateBook(
+    bookId: string,
+    updateBookDto: UpdateBookDto,
+  ): Promise<Book> {
+    const {
+      title,
+      author,
+      tags,
+      plot,
+      views,
+      totalVotes,
+      positiveVotes,
+      coverImage,
+      chapters,
+    } = updateBookDto;
 
     // Find the existing book
     const findBook = await this.bookModel.findById(bookId);
@@ -101,7 +153,9 @@ export class BookService {
     }
 
     const bookObjectId = new mongoose.Types.ObjectId(bookId);
-    const tagsObjectIds = tags ? tags.map(tag => new Types.ObjectId(tag)) : [];
+    const tagsObjectIds = tags
+      ? tags.map((tag) => new Types.ObjectId(tag))
+      : [];
 
     // Prepare update fields
     const updateFields: any = {};
@@ -115,38 +169,47 @@ export class BookService {
     if (coverImage) updateFields.coverImage = coverImage;
 
     // Set of current tags from the database and new tags from the request
-    const currentTagsSet = new Set(findBook.tags.map(tag => tag.toString())); // Convert ObjectId to string for comparison
-    const newTagsSet = new Set(tagsObjectIds.map(tag => tag.toString()));
+    const currentTagsSet = new Set(findBook.tags.map((tag) => tag.toString())); // Convert ObjectId to string for comparison
+    const newTagsSet = new Set(tagsObjectIds.map((tag) => tag.toString()));
 
     // Tags to add and remove
-    const tagsToAdd = [...newTagsSet].filter(tag => !currentTagsSet.has(tag));
-    const tagsToRemove = [...currentTagsSet].filter(tag => !newTagsSet.has(tag));
+    const tagsToAdd = [...newTagsSet].filter((tag) => !currentTagsSet.has(tag));
+    const tagsToRemove = [...currentTagsSet].filter(
+      (tag) => !newTagsSet.has(tag),
+    );
 
     // Handle adding new tags to the book and updating corresponding genres
     if (tagsToAdd.length > 0) {
-      updateFields.tags = [...new Set([...findBook.tags, ...tagsToAdd.map(tag => new Types.ObjectId(tag))])];
+      updateFields.tags = [
+        ...new Set([
+          ...findBook.tags,
+          ...tagsToAdd.map((tag) => new Types.ObjectId(tag)),
+        ]),
+      ];
 
       await Promise.all(
-        tagsToAdd.map(async tagId => {
+        tagsToAdd.map(async (tagId) => {
           const genre = await this.genreModel.findById(tagId);
           if (genre && !genre.bookIDs.includes(bookObjectId)) {
             genre.bookIDs.push(bookObjectId);
             await genre.save();
           }
-        })
+        }),
       );
     }
 
     // Handle removing old tags from the book and updating corresponding genres
     if (tagsToRemove.length > 0) {
       await Promise.all(
-        tagsToRemove.map(async tagId => {
+        tagsToRemove.map(async (tagId) => {
           const genre = await this.genreModel.findById(tagId);
           if (genre) {
-            genre.bookIDs = genre.bookIDs.filter(bookId => !bookId.equals(bookObjectId));
+            genre.bookIDs = genre.bookIDs.filter(
+              (bookId) => !bookId.equals(bookObjectId),
+            );
             await genre.save();
           }
-        })
+        }),
       );
 
       // Update the book's tags to the new set (excluding removed tags)
@@ -157,7 +220,7 @@ export class BookService {
     await this.bookModel.findByIdAndUpdate(
       bookId,
       { $set: updateFields },
-      { new: true }
+      { new: true },
     );
 
     // Return the updated book document
@@ -169,17 +232,18 @@ export class BookService {
     try {
       await this.bookModel.findByIdAndDelete(bookId);
       return {
-        message: "Book deleted successfully"
-      }
+        message: 'Book deleted successfully',
+      };
     } catch (error) {
-      throw new HttpException("Delete book failed", HttpStatus.INTERNAL_SERVER_ERROR)
-
+      throw new HttpException(
+        'Delete book failed',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   // thêm sách vào danh sách yêu thích
   async addToFavorites(userId: string, bookId: string): Promise<any> {
-
     const findBook = await this.bookModel.findById(bookId);
     const bookObjectId = new Types.ObjectId(bookId);
 
@@ -189,24 +253,25 @@ export class BookService {
 
     const findUser = await this.userModel.findById(userId);
     if (findUser.favourites.includes(bookObjectId)) {
-      throw new HttpException('Book is already in favourites', HttpStatus.CONFLICT);
+      throw new HttpException(
+        'Book is already in favourites',
+        HttpStatus.CONFLICT,
+      );
     }
 
     const updatedUser = await this.userModel.findByIdAndUpdate(
       userId,
       {
-        $push: { favourites: bookObjectId }
+        $push: { favourites: bookObjectId },
       },
-      { new: true }
-    )
+      { new: true },
+    );
 
     return updatedUser;
-
   }
 
   // xóa sách khỏi danh sách yêu thích
   async removeFromFavorites(userId: string, bookId: string): Promise<any> {
-
     const findBook = await this.bookModel.findById(bookId);
     const bookObjectId = new Types.ObjectId(bookId);
 
@@ -222,17 +287,16 @@ export class BookService {
     const updatedUser = await this.userModel.findByIdAndUpdate(
       userId,
       {
-        $pull: { favourites: bookObjectId }
+        $pull: { favourites: bookObjectId },
       },
-      { new: true }
-    )
+      { new: true },
+    );
 
     return updatedUser;
   }
 
   // thêm sách vào danh sách đang đọc
   async addToReadingList(userId: string, bookId: string): Promise<any> {
-
     const findBook = await this.bookModel.findById(bookId);
     const bookObjectId = new Types.ObjectId(bookId);
 
@@ -242,24 +306,25 @@ export class BookService {
 
     const findUser = await this.userModel.findById(userId);
     if (findUser.readingList.includes(bookObjectId)) {
-      throw new HttpException('Book is already in reading list', HttpStatus.CONFLICT);
+      throw new HttpException(
+        'Book is already in reading list',
+        HttpStatus.CONFLICT,
+      );
     }
 
     const updatedUser = await this.userModel.findByIdAndUpdate(
       userId,
       {
-        $push: { readingList: bookObjectId }
+        $push: { readingList: bookObjectId },
       },
-      { new: true }
-    )
+      { new: true },
+    );
 
     return updatedUser;
-
   }
 
   // xóa sách khỏi danh sách đang đọc
   async removeFromReadingList(userId: string, bookId: string): Promise<any> {
-
     const findBook = await this.bookModel.findById(bookId);
     const bookObjectId = new Types.ObjectId(bookId);
 
@@ -269,20 +334,20 @@ export class BookService {
 
     const findUser = await this.userModel.findById(userId);
     if (!findUser.readingList.includes(bookObjectId)) {
-      throw new HttpException('Book is not in reading list', HttpStatus.CONFLICT);
+      throw new HttpException(
+        'Book is not in reading list',
+        HttpStatus.CONFLICT,
+      );
     }
 
     const updatedUser = await this.userModel.findByIdAndUpdate(
       userId,
       {
-        $pull: { readingList: bookObjectId }
+        $pull: { readingList: bookObjectId },
       },
-      { new: true }
-    )
+      { new: true },
+    );
 
     return updatedUser;
   }
-
-
-
 }
