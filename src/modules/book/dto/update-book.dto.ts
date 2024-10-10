@@ -30,7 +30,4 @@ export class UpdateBookDto extends PartialType(CreateBookDto) {
 
   @IsOptional()
   chapters: string[];
-
-  @IsOptional()
-  isCompleted: boolean;
 }

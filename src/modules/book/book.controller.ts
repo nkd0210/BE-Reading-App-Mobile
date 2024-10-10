@@ -32,15 +32,7 @@ export class BookController {
     return this.bookService.getAllBooks(page, limit);
   }
 
-  @Get('getAllCompletedBooks')
-  getAllCompletedBooks(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ): Promise<any> {
-    return this.bookService.getAllCompletedBooks(page, limit);
-  }
-
-  @Get('getAllCompletedBooks')
+  @Get('getAllTrendingBooks')
   getAllTrendingBooks(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,

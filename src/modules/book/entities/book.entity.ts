@@ -42,9 +42,6 @@ export class Book {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chapter' }],
   })
   chapters: Types.ObjectId[];
-
-  @Prop({ default: false })
-  isCompleted: boolean;
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);

@@ -75,40 +75,6 @@ export class BookService {
     };
   }
 
-  async getAllCompletedBooks(page: number, limit: number): Promise<any> {
-    const skip = (page - 1) * limit;
-
-    // Query for books with isCompleted set to true
-    const completedBooks = await this.bookModel
-      .find({ isCompleted: true })
-      .skip(skip)
-      .limit(limit)
-      .populate('tags')
-      .populate({
-        path: 'chapters',
-        options: {
-          sort: { chapterNumber: 1 },
-        },
-      })
-      .exec();
-
-    const totalCompletedBooks = await this.bookModel.countDocuments({
-      isCompleted: true,
-    });
-    const totalPages = Math.ceil(totalCompletedBooks / limit);
-
-    if (completedBooks.length === 0) {
-      throw new HttpException('No completed books found', HttpStatus.NOT_FOUND);
-    }
-
-    return {
-      totalCompletedBooks,
-      page,
-      totalPages,
-      completedBooks,
-    };
-  }
-
   async getAllTrendingBooks(page: number, limit: number): Promise<any> {
     const skip = (page - 1) * limit;
 

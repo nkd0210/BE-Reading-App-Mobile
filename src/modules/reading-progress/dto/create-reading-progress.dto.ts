@@ -1,16 +1,15 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateReadingProgressDto {
+  @IsNotEmpty()
+  user: string;
 
-    @IsNotEmpty()
-    user: string;
+  @IsNotEmpty()
+  book: string;
 
-    @IsNotEmpty()
-    book: string;
+  @IsNotEmpty()
+  currentChapter: string;
 
-    @IsNotEmpty()
-    currentChapter: string;
-
-    @IsNotEmpty()
-    progress: number;
+  @IsOptional()
+  progress: number;
 }
