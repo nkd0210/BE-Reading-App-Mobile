@@ -13,8 +13,9 @@ import { ReadingProgressService } from './reading-progress.service';
 import { CreateReadingProgressDto } from './dto/create-reading-progress.dto';
 import { UpdateReadingProgressDto } from './dto/update-reading-progress.dto';
 import { ReadingProgress } from './entities/reading-progress.entity';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth('JWT-auth')
 @ApiTags('readingProgress')
 @Controller('readingProgress')
 export class ReadingProgressController {

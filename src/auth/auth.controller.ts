@@ -18,8 +18,8 @@ import { User } from 'src/modules/users/entities/user.entity';
 import { JwtAuthGuard } from './passport/jwt-auth.guard';
 import { FacebookGuard } from './passport/facebook.guard';
 import { GoogleGuard } from './passport/google.guard';
-import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
-
+import { ApiTags, ApiOperation, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+@ApiBearerAuth('JWT-auth')
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
