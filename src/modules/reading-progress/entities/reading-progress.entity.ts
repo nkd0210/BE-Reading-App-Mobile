@@ -8,19 +8,21 @@ export type UserDocument = HydratedDocument<ReadingProgress>;
 
 @Schema({ timestamps: true })
 export class ReadingProgress {
-    
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-    user: User;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+  user: User;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true })
-    book: Book;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true })
+  book: Book;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Chapter' })
-    currentChapter: Chapter;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Chapter' })
+  currentChapter: Chapter;
 
-    @Prop({ required: true, default: 0 })
-    progress: number;
+  @Prop({ required: true, default: 0 })
+  progress: number;
+
+  @Prop({ required: true, default: false })
+  isCompleted: boolean;
 }
 
-export const ReadingProgressSchema = SchemaFactory.createForClass(ReadingProgress)
-
+export const ReadingProgressSchema =
+  SchemaFactory.createForClass(ReadingProgress);

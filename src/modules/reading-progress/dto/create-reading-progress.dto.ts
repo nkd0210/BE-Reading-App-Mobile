@@ -12,4 +12,7 @@ export class CreateReadingProgressDto {
 
   @IsOptional()
   progress: number;
+
+  @IsOptional()
+  isCompleted: boolean;
 }

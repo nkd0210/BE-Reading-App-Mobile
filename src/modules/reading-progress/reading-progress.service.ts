@@ -9,110 +9,160 @@ import { User } from '../users/entities/user.entity';
 @Injectable()
 export class ReadingProgressService {
   constructor(
-    @InjectModel(ReadingProgress.name) private readingProgressModel: Model<ReadingProgress>,
-    @InjectModel(User.name) private userModel: Model<User>
-
-  ) { }
+    @InjectModel(ReadingProgress.name)
+    private readingProgressModel: Model<ReadingProgress>,
+    @InjectModel(User.name) private userModel: Model<User>,
+  ) {}
 
   // tạo tiến độ khi đọc sách
-  async createReadingProgress(createReadingProgressDto: CreateReadingProgressDto): Promise<ReadingProgress> {
+  async createReadingProgress(
+    createReadingProgressDto: CreateReadingProgressDto,
+  ): Promise<ReadingProgress> {
     const { user, book, currentChapter, progress } = createReadingProgressDto;
 
     const newReadingProgress = await this.readingProgressModel.create({
       user,
       book,
       currentChapter,
-      progress
+      progress,
     });
 
-    await this.userModel.findByIdAndUpdate(
-      user,
-      {
-        $push: {
-          readingProgress: newReadingProgress._id
-        }
-      }
-    )
+    await this.userModel.findByIdAndUpdate(user, {
+      $push: {
+        readingProgress: newReadingProgress._id,
+      },
+    });
 
     return newReadingProgress;
   }
 
-  // lấy tất cả tiến độ đọc sách trong hệ thống
-  async getAllReadingProgresss(page: number, limit: number): Promise<any> {
+  // lấy tất cả sách đang đọc của người dùng
+  async getIncompleteReadingProgressOfUser(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<any> {
     const skip = (page - 1) * limit;
 
-    const allReadingProgress = await this.readingProgressModel.find()
-      .populate('user book currentChapter')
-      .skip(skip)
-      .limit(limit)
-      .exec();
-
-    const totalReadingProgress = await this.readingProgressModel.countDocuments();
-    const totalPages = Math.ceil(totalReadingProgress / limit);
-
-    return {
-      totalReadingProgress,
-      page,
-      totalPages,
-      allReadingProgress
-    }
-  }
-
-  // lấy tất cả tiến độ đọc sách của người dùng
-  async getAllReadingProgressOfUser(userId: string, page: number, limit: number): Promise<any> {
-    const skip = (page - 1) * limit;
-    const findUser = await this.userModel.findById(userId).populate('readingProgress');
+    // Fetch user and populate readingProgress field
+    const findUser = await this.userModel
+      .findById(userId)
+      .populate('readingProgress');
 
     if (!findUser) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const allReadingProgress = findUser.readingProgress;
-    const totalReadingProgress = allReadingProgress.length;
-    const totalPages = Math.ceil(totalReadingProgress / limit);
+    // Filter the readingProgress by isCompleted = false
+    const incompleteReadingProgress = findUser.readingProgress.filter(
+      (progress: any) => progress.isCompleted === false,
+    );
+
+    const totalIncompleteReadingProgress = incompleteReadingProgress.length;
+    const totalPages = Math.ceil(totalIncompleteReadingProgress / limit);
+
+    // Paginate the results
+    const paginatedIncompleteProgress = incompleteReadingProgress.slice(
+      skip,
+      skip + limit,
+    );
 
     return {
       user: findUser,
-      totalReadingProgress,
+      totalIncompleteReadingProgress,
       page,
       totalPages,
-      allReadingProgress
-    }
+      incompleteReadingProgress: paginatedIncompleteProgress,
+    };
   }
 
-  //lấy từng tiến độ đọc sách 
-  async getSingleReadingProgress(readingProgressId: string): Promise<ReadingProgress> {
-    const findReadingProgress = await this.readingProgressModel.findById(readingProgressId).populate('book currentChapter')
+  //lấy từng tiến độ đọc sách
+  async getSingleReadingProgress(
+    readingProgressId: string,
+  ): Promise<ReadingProgress> {
+    const findReadingProgress = await this.readingProgressModel
+      .findById(readingProgressId)
+      .populate('book currentChapter');
 
     if (!findReadingProgress) {
-      throw new HttpException('Reading Progress not found', HttpStatus.NOT_FOUND)
+      throw new HttpException(
+        'Reading Progress not found',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     return findReadingProgress;
   }
 
   // cập nhật tiến độ đọc sách
-  async updateReadingProgress(readingProgressId: string, updateReadingProgressDto: UpdateReadingProgressDto): Promise<ReadingProgress> {
-    const findReadingProgress = await this.readingProgressModel.findById(readingProgressId);
+  async updateReadingProgress(
+    readingProgressId: string,
+    updateReadingProgressDto: UpdateReadingProgressDto,
+  ): Promise<ReadingProgress> {
+    const findReadingProgress =
+      await this.readingProgressModel.findById(readingProgressId);
 
     if (!findReadingProgress) {
-      throw new HttpException('Reading Progress not found', HttpStatus.NOT_FOUND)
+      throw new HttpException(
+        'Reading Progress not found',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     const { currentChapter, progress } = updateReadingProgressDto;
 
-    const updatedReadingProgress = await this.readingProgressModel.findByIdAndUpdate(
-      readingProgressId,
-      {
-        $set: {
-          currentChapter,
-          progress
-        }
-      },
-      { new: true }
-    )
+    const updatedReadingProgress =
+      await this.readingProgressModel.findByIdAndUpdate(
+        readingProgressId,
+        {
+          $set: {
+            currentChapter,
+            progress,
+          },
+        },
+        { new: true },
+      );
 
     return updatedReadingProgress;
+  }
+
+  // lấy sách đọc xong
+  async getCompletedReadingProgressOfUser(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<any> {
+    const skip = (page - 1) * limit;
+
+    // Fetch user and populate readingProgress field
+    const findUser = await this.userModel
+      .findById(userId)
+      .populate('readingProgress');
+
+    if (!findUser) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Filter the readingProgress by isCompleted = true
+    const completedReadingProgress = findUser.readingProgress.filter(
+      (progress: any) => progress.isCompleted === true,
+    );
+
+    const totalCompletedReadingProgress = completedReadingProgress.length;
+    const totalPages = Math.ceil(totalCompletedReadingProgress / limit);
+
+    // Paginate the results
+    const paginatedCompletedProgress = completedReadingProgress.slice(
+      skip,
+      skip + limit,
+    );
+
+    return {
+      totalCompletedReadingProgress,
+      page,
+      totalPages,
+      completedReadingProgress: paginatedCompletedProgress,
+    };
   }
 
   // xóa tiến dộ đọc sách
@@ -120,11 +170,13 @@ export class ReadingProgressService {
     try {
       await this.readingProgressModel.findByIdAndDelete(readingProgressId);
       return {
-        message: "Reading Progress deleted successfully"
-      }
+        message: 'Reading Progress deleted successfully',
+      };
     } catch (error) {
-      throw new HttpException("Reading Progress deleted failed", HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        'Reading Progress deleted failed',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
-
 }
