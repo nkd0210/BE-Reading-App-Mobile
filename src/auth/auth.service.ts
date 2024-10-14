@@ -43,31 +43,31 @@ export class AuthService {
       sub: user._id,
     };
 
-    const refresh_token = await this.createRefreshToken(payload);
+    const refreshToken = await this.createRefreshToken(payload);
 
     const userProfile = await this.usersService.getUserProfile(user.email);
 
-    await this.usersService.updateUserToken(refresh_token, user._id);
+    await this.usersService.updateUserToken(refreshToken, user._id);
 
     return {
-      access_token: this.jwtService.sign(payload),
-      refresh_token,
+      accessToken: this.jwtService.sign(payload),
+      refreshToken,
       userProfile,
     };
   }
 
   createRefreshToken = (payload: any) => {
-    const refresh_token = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('JWT_refreshToken_SECRET'),
       expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRE'),
     });
-    return refresh_token;
+    return refreshToken;
   };
 
   processNewToken = async (refreshToken: string) => {
     try {
       this.jwtService.verify(refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+        secret: this.configService.get<string>('JWT_refreshToken_SECRET'),
       });
       let user = await this.usersService.findUserByToken(refreshToken);
 
@@ -79,14 +79,14 @@ export class AuthService {
         };
         const userProfile = await this.usersService.getUserProfile(user.email);
 
-        const refresh_token = this.createRefreshToken(payload);
+        const refreshToken = this.createRefreshToken(payload);
 
         //update user with refresh token
-        await this.usersService.updateUserToken(refresh_token, _id.toString());
+        await this.usersService.updateUserToken(refreshToken, _id.toString());
 
         return {
-          access_token: this.jwtService.sign(payload),
-          refresh_token,
+          accessToken: this.jwtService.sign(payload),
+          refreshToken,
           userProfile,
         };
       } else {
