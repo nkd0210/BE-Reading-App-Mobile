@@ -25,9 +25,17 @@ export class CreateBookDto {
 
   @ApiProperty({
     description: 'URL of the book cover image',
-    example: 'https://example.com/cover.jpg', // Example value for the cover image
+    example: 'https://i.postimg.cc/8ckPPDky/image-1.png', // Example value for the cover image
     required: false, // Since it's optional, you can set this to false
   })
   @IsOptional()
   coverImage?: string; // Using optional chaining
+
+  @ApiProperty({
+    description: 'URL of the book cover image',
+    example: 'https://i.postimg.cc/jq1v1hhR/image.png', // Example value for the cover image
+    required: false, // Since it's optional, you can set this to false
+  })
+  @IsOptional()
+  authorImage?: string; // Using optional chaining
 }

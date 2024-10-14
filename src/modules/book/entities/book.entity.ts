@@ -29,6 +29,9 @@ export class Book {
   @Prop()
   coverImage: string;
 
+  @Prop()
+  authorImage: string;
+
   @Prop({ default: 0 })
   views: number;
 
