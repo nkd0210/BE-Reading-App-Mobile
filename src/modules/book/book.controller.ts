@@ -15,6 +15,7 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from './entities/book.entity';
 import { Types } from 'mongoose';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Public } from 'src/decorator/customize';
 @ApiBearerAuth('JWT-auth')
 @ApiTags('book')
 @Controller('book')
@@ -34,6 +35,7 @@ export class BookController {
     return this.bookService.getAllBooks(page, limit);
   }
 
+  @Public()
   @Get('getAllTrendingBooks')
   getAllTrendingBooks(
     @Query('page') page: number = 1,
