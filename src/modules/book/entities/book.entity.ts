@@ -7,10 +7,10 @@ export type BookDocument = HydratedDocument<Book>;
 
 @Schema({ timestamps: true })
 export class Book {
-  @Prop({ required: true })
+  @Prop()
   title: string;
 
-  @Prop({ required: true })
+  @Prop()
   authorId: string;
 
   @Prop()
@@ -29,7 +29,7 @@ export class Book {
   })
   tags: Types.ObjectId[];
 
-  @Prop({ required: true })
+  @Prop()
   plot: string;
 
   @Prop()

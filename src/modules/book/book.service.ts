@@ -17,8 +17,7 @@ export class BookService {
 
   // tạo sách
   async createBook(createBookDto: CreateBookDto): Promise<Book> {
-    const { title, authorId, authorName, plot, coverImage, authorImage } =
-      createBookDto;
+    const { title } = createBookDto;
 
     const findSameBookTitle = await this.bookModel.findOne({ title });
 
@@ -30,7 +29,7 @@ export class BookService {
     }
 
     const newBook = await this.bookModel.create({
-      createBookDto,
+      ...createBookDto,
     });
 
     return newBook;

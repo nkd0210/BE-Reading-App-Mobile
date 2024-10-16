@@ -14,7 +14,7 @@ export class CreateBookDto {
     description: 'A brief plot summary of the book',
     example: 'A story about the American dream set in the 1920s',
   })
-  @IsNotEmpty()
+  @IsNotEmpty() // This should be required based on the schema
   plot: string;
 
   @ApiProperty({
@@ -49,7 +49,7 @@ export class CreateBookDto {
 
   @ApiProperty({
     description: 'Array of Genre IDs',
-    example: ['64afc8b0bcf86cd799439010', '64afc8b0bcf86cd799439012'], // Example ObjectIds
+    example: [], // Example ObjectIds
     required: false,
   })
   @IsOptional()
@@ -82,7 +82,7 @@ export class CreateBookDto {
 
   @ApiProperty({
     description: 'Array of Chapter IDs',
-    example: ['64afc8b0bcf86cd799439013', '64afc8b0bcf86cd799439014'], // Example ObjectIds
+    example: [], // Example ObjectIds
     required: false,
   })
   @IsOptional()
