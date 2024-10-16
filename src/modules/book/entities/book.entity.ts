@@ -11,7 +11,13 @@ export class Book {
   title: string;
 
   @Prop({ required: true })
-  author: string;
+  authorId: string;
+
+  @Prop()
+  authorImage: string;
+
+  @Prop()
+  authorName: string;
 
   @Prop({
     type: [
@@ -28,9 +34,6 @@ export class Book {
 
   @Prop()
   coverImage: string;
-
-  @Prop()
-  authorImage: string;
 
   @Prop({ default: 0 })
   views: number;
