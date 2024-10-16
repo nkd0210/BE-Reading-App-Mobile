@@ -1,78 +1,83 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateBookDto } from './create-book.dto';
-import { IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
 export class UpdateBookDto extends PartialType(CreateBookDto) {
   @ApiProperty({
     description: 'The title of the book',
-    example: 'The Great Gatsby', // Example value for the title
-    required: false, // Not required since this is an update DTO
+    example: 'The Great Gatsby',
+    required: false, // Not required in UpdateBookDto
   })
-  @IsOptional()
   title?: string;
 
   @ApiProperty({
-    description: 'The author of the book',
-    example: 'F. Scott Fitzgerald', // Example value for the author
-    required: false,
-  })
-  @IsOptional()
-  author?: string;
-
-  @ApiProperty({
-    description: 'Tags associated with the book',
-    example: ['Classic', 'Fiction'], // Example value for the tags
-    required: false,
-  })
-  @IsOptional()
-  tags?: string[];
-
-  @ApiProperty({
     description: 'A brief plot summary of the book',
-    example: 'A story about the American dream set in the 1920s', // Example value for the plot
+    example: 'A story about the American dream set in the 1920s',
     required: false,
   })
-  @IsOptional()
   plot?: string;
 
   @ApiProperty({
-    description: 'The number of views the book has received',
-    example: 150, // Example value for views
-    required: false,
-  })
-  @IsOptional()
-  views?: number;
-
-  @ApiProperty({
-    description: 'The total number of votes the book has received',
-    example: 200, // Example value for totalVotes
-    required: false,
-  })
-  @IsOptional()
-  totalVotes?: number;
-
-  @ApiProperty({
-    description: 'The number of positive votes the book has received',
-    example: 180, // Example value for positiveVotes
-    required: false,
-  })
-  @IsOptional()
-  positiveVotes?: number;
-
-  @ApiProperty({
     description: 'URL of the book cover image',
-    example: 'https://example.com/cover.jpg', // Example value for the cover image
+    example: 'https://i.postimg.cc/8ckPPDky/image-1.png',
     required: false,
   })
-  @IsOptional()
   coverImage?: string;
 
   @ApiProperty({
-    description: 'Array of chapter IDs associated with the book',
-    example: ['chapterId1', 'chapterId2'], // Example value for chapters
+    description: 'URL of the author image',
+    example: 'https://i.postimg.cc/jq1v1hhR/image.png',
     required: false,
   })
-  @IsOptional()
-  chapters?: string[];
+  authorImage?: string;
+
+  @ApiProperty({
+    description: 'The ID of the author',
+    example: '6701646ca74cc28551f85cb8',
+    required: false,
+  })
+  authorId?: string;
+
+  @ApiProperty({
+    description: 'The name of the author',
+    example: 'SOW',
+    required: false,
+  })
+  authorName?: string;
+
+  @ApiProperty({
+    description: 'Array of Genre IDs',
+    example: ['64afc8b0bcf86cd799439010', '64afc8b0bcf86cd799439012'],
+    required: false,
+  })
+  tags?: Types.ObjectId[];
+
+  @ApiProperty({
+    description: 'Total number of views',
+    example: 300,
+    required: false,
+  })
+  views?: number;
+
+  @ApiProperty({
+    description: 'Total number of votes',
+    example: 100,
+    required: false,
+  })
+  totalVotes?: number;
+
+  @ApiProperty({
+    description: 'Total number of positive votes',
+    example: 80,
+    required: false,
+  })
+  positiveVote?: number;
+
+  @ApiProperty({
+    description: 'Array of Chapter IDs',
+    example: ['64afc8b0bcf86cd799439013', '64afc8b0bcf86cd799439014'],
+    required: false,
+  })
+  chapters?: Types.ObjectId[];
 }

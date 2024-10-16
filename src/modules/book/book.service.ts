@@ -127,12 +127,12 @@ export class BookService {
   ): Promise<Book> {
     const {
       title,
-      author,
+      authorName,
+      positiveVotes,
       tags,
       plot,
       views,
       totalVotes,
-      positiveVotes,
       coverImage,
       chapters,
     } = updateBookDto;
@@ -153,7 +153,7 @@ export class BookService {
     const updateFields: any = {};
 
     if (title) updateFields.title = title;
-    if (author) updateFields.author = author;
+    if (authorName) updateFields.authorName = authorName;
     if (plot) updateFields.plot = plot;
     if (views) updateFields.views = views;
     if (totalVotes) updateFields.totalVotes = totalVotes;

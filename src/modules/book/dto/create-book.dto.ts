@@ -78,7 +78,7 @@ export class CreateBookDto {
     required: false,
   })
   @IsOptional()
-  positiveVote?: number;
+  positiveVotes?: number;
 
   @ApiProperty({
     description: 'Array of Chapter IDs',

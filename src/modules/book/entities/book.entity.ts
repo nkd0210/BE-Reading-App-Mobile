@@ -42,7 +42,7 @@ export class Book {
   totalVotes: number;
 
   @Prop({ default: 0 })
-  positiveVote: number;
+  positiveVotes: number;
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chapter' }],
