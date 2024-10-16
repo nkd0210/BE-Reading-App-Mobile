@@ -1,10 +1,18 @@
-import { IsArray, IsEmail, IsEmpty, IsNotEmpty, IsOptional, ValidateNested } from "class-validator";
+import { IsArray, IsNotEmpty, IsOptional } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateGenreDto {
+  @ApiProperty({
+    description: 'The name of the genre',
+    example: 'Fantasy',
+  })
+  @IsNotEmpty()
+  name: string;
 
-    @IsNotEmpty()
-    name: string;
-
-    @IsOptional()
-    description: string;
+  @ApiPropertyOptional({
+    description: 'Optional description of the genre',
+    example: 'A genre of speculative fiction set in a fictional universe.',
+  })
+  @IsOptional()
+  description: string;
 }

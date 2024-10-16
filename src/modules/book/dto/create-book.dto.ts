@@ -49,7 +49,7 @@ export class CreateBookDto {
 
   @ApiProperty({
     description: 'Array of Genre IDs',
-    example: [], // Example ObjectIds
+    example: ['670fe41b16a89971003bea08', '670fe42b16a89971003bea0a'], // Example ObjectIds
     required: false,
   })
   @IsOptional()
