@@ -14,17 +14,20 @@ export class Chapter {
     })
     book: Book
 
-    @Prop({ required: true })
+    @Prop()
     title: string;
 
-    @Prop({ required: true })
+    @Prop()
     chapterNumber: number;
 
     @Prop()
     chapterImage: string;
 
-    @Prop({ required: true })
+    @Prop()
     content: string;
+
+    @Prop({ default: false })
+    isPublish: boolean;
 }
 
 export const ChapterSchema = SchemaFactory.createForClass(Chapter);

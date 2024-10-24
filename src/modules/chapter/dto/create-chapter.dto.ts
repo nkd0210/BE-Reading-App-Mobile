@@ -6,7 +6,7 @@ export class CreateChapterDto {
     description: 'The title of the chapter',
     example: 'Introduction to Programming', // Example value for the title
   })
-  @IsNotEmpty()
+  @IsOptional()
   title: string;
 
   @ApiProperty({
@@ -30,6 +30,6 @@ export class CreateChapterDto {
     description: 'The content of the chapter',
     example: 'This chapter covers the basics of programming...', // Example value for the content
   })
-  @IsNotEmpty()
+  @IsOptional()
   content: string;
 }

@@ -36,4 +36,7 @@ export class UpdateChapterDto extends PartialType(CreateChapterDto) {
   })
   @IsOptional()
   content?: string;
+
+  @IsOptional()
+  isPublish?: boolean;
 }

@@ -8,6 +8,8 @@ import {
   Delete,
   Query,
   Put,
+  UseGuards,
+  Request
 } from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -16,15 +18,19 @@ import { Book } from './entities/book.entity';
 import { Types } from 'mongoose';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Public } from 'src/decorator/customize';
+import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
+
 @ApiBearerAuth('JWT-auth')
 @ApiTags('book')
 @Controller('book')
 export class BookController {
-  constructor(private readonly bookService: BookService) {}
+  constructor(private readonly bookService: BookService) { }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/createBook')
-  createBook(@Body() createBookDto: CreateBookDto): Promise<Book> {
-    return this.bookService.createBook(createBookDto);
+  createBook(@Body() createBookDto: CreateBookDto, @Request() req: any): Promise<Book> {
+    const user = req.user;
+    return this.bookService.createBook(createBookDto, user);
   }
 
   @Get('getAllBooks')

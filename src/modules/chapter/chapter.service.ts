@@ -21,16 +21,12 @@ export class ChapterService {
       throw new HttpException("Book not found", HttpStatus.NOT_FOUND)
     }
 
-    const { title, chapterNumber, chapterImage, content } = createChapterDto;
-
-    const newChapterNumber = chapterNumber || findBook.chapters.length + 1;
+    const newChapterNumber = createChapterDto.chapterNumber || findBook.chapters.length + 1;
 
     const newChapter = await this.chapterModel.create({
       book: bookId,
-      title,
       chapterNumber: newChapterNumber,
-      chapterImage,
-      content
+      ...createChapterDto
     });
 
     await this.bookModel.findByIdAndUpdate(
@@ -117,7 +113,7 @@ export class ChapterService {
     };
   }
 
-  // cập nhật từng cuốn sách
+  // cập nhật từng chapter trong cuốn sách
   async updateChapter(bookId: string, chapterId: string, updateChapterDto: UpdateChapterDto): Promise<Chapter> {
     const findBook = await this.bookModel.findById(bookId);
 
@@ -125,7 +121,7 @@ export class ChapterService {
       throw new HttpException("Book not found", HttpStatus.NOT_FOUND)
     }
 
-    const { title, chapterNumber, chapterImage, content } = updateChapterDto;
+    const { title, chapterNumber, chapterImage, content, isPublish } = updateChapterDto;
 
     const updatedChapter = await this.chapterModel.findByIdAndUpdate(
       chapterId, {
@@ -133,14 +129,15 @@ export class ChapterService {
         title,
         chapterNumber,
         chapterImage,
-        content
+        content,
+        isPublish
       }
     },
       { new: true }
     )
 
     return updatedChapter;
-  } 
+  }
 
   // xóa sách
   async deleteChapter(bookId: string): Promise<any> {
@@ -153,6 +150,7 @@ export class ChapterService {
       throw new HttpException("Chapter deleted failed", HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
+
 
 
 }

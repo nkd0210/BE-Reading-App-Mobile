@@ -48,6 +48,10 @@ export class Book {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chapter' }],
   })
   chapters: Types.ObjectId[];
+
+  @Prop({ default: false })
+  isPublish: boolean;
+
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);

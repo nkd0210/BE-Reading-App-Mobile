@@ -14,7 +14,7 @@ export class CreateBookDto {
     description: 'A brief plot summary of the book',
     example: 'A story about the American dream set in the 1920s',
   })
-  @IsNotEmpty() // This should be required based on the schema
+  @IsOptional() // This should be required based on the schema
   plot: string;
 
   @ApiProperty({
@@ -37,14 +37,14 @@ export class CreateBookDto {
     description: 'The ID of the author',
     example: '6701646ca74cc28551f85cb8',
   })
-  @IsNotEmpty()
+  @IsOptional()
   authorId: string;
 
   @ApiProperty({
     description: 'The name of the author',
     example: 'SOW',
   })
-  @IsNotEmpty()
+  @IsOptional()
   authorName: string;
 
   @ApiProperty({

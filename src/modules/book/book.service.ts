@@ -13,13 +13,12 @@ export class BookService {
     @InjectModel(Book.name) private bookModel: Model<Book>,
     @InjectModel(Genre.name) private genreModel: Model<Genre>,
     @InjectModel(User.name) private userModel: Model<User>,
-  ) {}
+  ) { }
 
   // tạo sách
-  async createBook(createBookDto: CreateBookDto): Promise<Book> {
-    const { title } = createBookDto;
+  async createBook(createBookDto: CreateBookDto, user: any): Promise<Book> {
 
-    const findSameBookTitle = await this.bookModel.findOne({ title });
+    const findSameBookTitle = await this.bookModel.findOne({ title: createBookDto.title });
 
     if (findSameBookTitle) {
       throw new HttpException(
@@ -30,6 +29,7 @@ export class BookService {
 
     const newBook = await this.bookModel.create({
       ...createBookDto,
+      authorId: user._id,
     });
 
     return newBook;
@@ -134,6 +134,7 @@ export class BookService {
       totalVotes,
       coverImage,
       chapters,
+      isPublish
     } = updateBookDto;
 
     // Find the existing book
@@ -158,6 +159,7 @@ export class BookService {
     if (totalVotes) updateFields.totalVotes = totalVotes;
     if (positiveVotes) updateFields.positiveVotes = positiveVotes;
     if (coverImage) updateFields.coverImage = coverImage;
+    if (isPublish) updateFields.isPublish = isPublish;
 
     // Set of current tags from the database and new tags from the request
     const currentTagsSet = new Set(findBook.tags.map((tag) => tag.toString())); // Convert ObjectId to string for comparison

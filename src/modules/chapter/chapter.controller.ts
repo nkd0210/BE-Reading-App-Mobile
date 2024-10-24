@@ -21,7 +21,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiTags('chapter')
 @Controller('chapter')
 export class ChapterController {
-  constructor(private readonly chapterService: ChapterService) {}
+  constructor(private readonly chapterService: ChapterService) { }
 
   @Post('/createChapter/:bookId')
   createChapter(
@@ -77,4 +77,5 @@ export class ChapterController {
   deleteChapter(@Param('chapterId') chapterId: string): Promise<any> {
     return this.chapterService.deleteChapter(chapterId);
   }
+
 }
