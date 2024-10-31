@@ -343,4 +343,29 @@ export class BookService {
 
     return updatedUser;
   }
+
+  async getAllUserBooks(userId: string, page: number, limit: number): Promise<any> {
+
+    const skip = (page - 1) * limit;
+
+    const userBooks = await this.bookModel.find({ authorId: userId })
+      .skip(skip)
+      .limit(limit);
+
+    const totalBooks = await this.bookModel.countDocuments({ authorId: userId });
+    const totalPages = Math.ceil(totalBooks / limit);
+
+    if (userBooks.length === 0) {
+      throw new HttpException('No books found', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      totalBooks,
+      page,
+      totalPages,
+      userBooks
+    }
+
+
+  }
 }
