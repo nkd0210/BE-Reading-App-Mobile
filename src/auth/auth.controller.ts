@@ -52,6 +52,15 @@ export class AuthController {
 
   @Public()
   @Post('/refresh')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        refreshToken: { type: 'string' },
+      },
+    },
+    description: 'Refresh token to generate a new access token',
+  })
   handleRefreshToken(@Body() body: { refreshToken: string }) {
     return this.authService.processNewToken(body.refreshToken);
   }

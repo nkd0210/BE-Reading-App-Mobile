@@ -21,7 +21,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiTags('chapter')
 @Controller('chapter')
 export class ChapterController {
-  constructor(private readonly chapterService: ChapterService) { }
+  constructor(private readonly chapterService: ChapterService) {}
 
   @Post('/createChapter/:bookId')
   createChapter(
@@ -60,22 +60,16 @@ export class ChapterController {
     return this.chapterService.getChapter(chapterId, pageNumber);
   }
 
-  @Put('/updateChapter/:bookId/:chapterId')
+  @Put('/updateChapter/:chapterId')
   updateChapter(
-    @Param('bookId') bookId: string,
     @Param('chapterId') chapterId: string,
     @Body() updateChapterDto: UpdateChapterDto,
   ): Promise<Chapter> {
-    return this.chapterService.updateChapter(
-      bookId,
-      chapterId,
-      updateChapterDto,
-    );
+    return this.chapterService.updateChapter(chapterId, updateChapterDto);
   }
 
   @Delete('/deleteChapter/:chapterId')
   deleteChapter(@Param('chapterId') chapterId: string): Promise<any> {
     return this.chapterService.deleteChapter(chapterId);
   }
-
 }
