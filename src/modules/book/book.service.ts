@@ -13,12 +13,13 @@ export class BookService {
     @InjectModel(Book.name) private bookModel: Model<Book>,
     @InjectModel(Genre.name) private genreModel: Model<Genre>,
     @InjectModel(User.name) private userModel: Model<User>,
-  ) { }
+  ) {}
 
   // tạo sách
   async createBook(createBookDto: CreateBookDto, user: any): Promise<Book> {
-
-    const findSameBookTitle = await this.bookModel.findOne({ title: createBookDto.title });
+    const findSameBookTitle = await this.bookModel.findOne({
+      title: createBookDto.title,
+    });
 
     if (findSameBookTitle) {
       throw new HttpException(
@@ -134,7 +135,7 @@ export class BookService {
       totalVotes,
       coverImage,
       chapters,
-      isPublish
+      isPublish,
     } = updateBookDto;
 
     // Find the existing book
@@ -344,15 +345,21 @@ export class BookService {
     return updatedUser;
   }
 
-  async getAllUserBooks(userId: string, page: number, limit: number): Promise<any> {
-
+  async getAllUserBooks(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<any> {
     const skip = (page - 1) * limit;
 
-    const userBooks = await this.bookModel.find({ authorId: userId })
+    const userBooks = await this.bookModel
+      .find({ authorId: userId })
       .skip(skip)
       .limit(limit);
 
-    const totalBooks = await this.bookModel.countDocuments({ authorId: userId });
+    const totalBooks = await this.bookModel.countDocuments({
+      authorId: userId,
+    });
     const totalPages = Math.ceil(totalBooks / limit);
 
     if (userBooks.length === 0) {
@@ -363,9 +370,69 @@ export class BookService {
       totalBooks,
       page,
       totalPages,
-      userBooks
+      userBooks,
+    };
+  }
+
+  async getAllUserDraftBooks(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<any> {
+    const skip = (page - 1) * limit;
+
+    const userBooks = await this.bookModel
+      .find({ authorId: userId, isPublish: false })
+      .skip(skip)
+      .limit(limit);
+
+    const totalBooks = await this.bookModel.countDocuments({
+      authorId: userId,
+      isPublish: false,
+    });
+
+    const totalPages = Math.ceil(totalBooks / limit);
+
+    if (userBooks.length === 0) {
+      throw new HttpException('No books found', HttpStatus.NOT_FOUND);
     }
 
+    return {
+      totalBooks,
+      page,
+      totalPages,
+      userBooks,
+    };
+  }
 
+  async getAllUserPublishedBooks(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<any> {
+    const skip = (page - 1) * limit;
+
+    const userBooks = await this.bookModel
+      .find({ authorId: userId, isPublish: true })
+      .skip(skip)
+      .limit(limit);
+
+    const totalBooks = await this.bookModel.countDocuments({
+      authorId: userId,
+      isPublish: true,
+    });
+
+    const totalPages = Math.ceil(totalBooks / limit);
+
+    if (userBooks.length === 0) {
+      throw new HttpException('No books found', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      totalBooks,
+      page,
+      totalPages,
+      userBooks,
+    };
   }
 }

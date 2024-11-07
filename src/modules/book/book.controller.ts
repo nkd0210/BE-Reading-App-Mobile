@@ -9,7 +9,7 @@ import {
   Query,
   Put,
   UseGuards,
-  Request
+  Request,
 } from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -24,11 +24,14 @@ import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 @ApiTags('book')
 @Controller('book')
 export class BookController {
-  constructor(private readonly bookService: BookService) { }
+  constructor(private readonly bookService: BookService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('/createBook')
-  createBook(@Body() createBookDto: CreateBookDto, @Request() req: any): Promise<Book> {
+  createBook(
+    @Body() createBookDto: CreateBookDto,
+    @Request() req: any,
+  ): Promise<Book> {
     const user = req.user;
     return this.bookService.createBook(createBookDto, user);
   }
@@ -107,5 +110,23 @@ export class BookController {
     @Query('limit') limit: number = 10,
   ): Promise<any> {
     return this.bookService.getAllUserBooks(userId, page, limit);
+  }
+
+  @Get('/getAllUserPublishedBooks/:userId')
+  getAllUserPublishedBooks(
+    @Param('userId') userId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<any> {
+    return this.bookService.getAllUserPublishedBooks(userId, page, limit);
+  }
+
+  @Get('/getAllUserDraftBooks/:userId')
+  getAllUserDraftBooks(
+    @Param('userId') userId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<any> {
+    return this.bookService.getAllUserDraftBooks(userId, page, limit);
   }
 }
