@@ -113,12 +113,13 @@ export class BookController {
     return this.bookService.removeFromReadingList(userId, bookId);
   }
 
-  @Get('/getAllUserBooks/:userId')
+  @Get('/getAllUserBooks/')
   getAllUserBooks(
-    @Param('userId') userId: string,
+    @Request() req: any,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ): Promise<any> {
+    const userId = req.user._id;
     return this.bookService.getAllUserBooks(userId, page, limit);
   }
 
