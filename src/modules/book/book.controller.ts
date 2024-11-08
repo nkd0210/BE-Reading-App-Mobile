@@ -122,21 +122,23 @@ export class BookController {
     return this.bookService.getAllUserBooks(userId, page, limit);
   }
 
-  @Get('/getAllUserPublishedBooks/:userId')
+  @Get('/getAllUserPublishedBooks')
   getAllUserPublishedBooks(
-    @Param('userId') userId: string,
+    @Request() req: any,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ): Promise<any> {
+    const userId = req.user._id;
     return this.bookService.getAllUserPublishedBooks(userId, page, limit);
   }
 
-  @Get('/getAllUserDraftBooks/:userId')
+  @Get('/getAllUserDraftBooks')
   getAllUserDraftBooks(
-    @Param('userId') userId: string,
+    @Request() req: any,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ): Promise<any> {
+    const userId = req.user._id;
     return this.bookService.getAllUserDraftBooks(userId, page, limit);
   }
 }
