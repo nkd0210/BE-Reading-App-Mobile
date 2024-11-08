@@ -113,7 +113,7 @@ export class BookController {
     return this.bookService.removeFromReadingList(userId, bookId);
   }
 
-  @Get('/getAllUserBooks/')
+  @Get('/getAllUserBooks')
   getAllUserBooks(
     @Request() req: any,
     @Query('page') page: number = 1,
