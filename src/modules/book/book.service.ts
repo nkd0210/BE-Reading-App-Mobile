@@ -435,4 +435,55 @@ export class BookService {
       userBooks,
     };
   }
+
+  async publishBook(bookId: string): Promise<Book> {
+    // Find the existing book
+    const findBook = await this.bookModel.findById(bookId);
+
+    if (!findBook) {
+      throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Check if the book is already published
+    if (findBook.isPublish) {
+      throw new HttpException(
+        'Book is already published',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Update the isPublish field to true
+    await this.bookModel.findByIdAndUpdate(
+      bookId,
+      { $set: { isPublish: true } },
+      { new: true },
+    );
+
+    // Return the updated book document
+    return this.bookModel.findById(bookId);
+  }
+
+  async unpublishBook(bookId: string): Promise<Book> {
+    // Find the existing book
+    const findBook = await this.bookModel.findById(bookId);
+
+    if (!findBook) {
+      throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Check if the book is already published
+    if (findBook.isPublish) {
+      throw new HttpException('Book is already draft', HttpStatus.BAD_REQUEST);
+    }
+
+    // Update the isPublish field to true
+    await this.bookModel.findByIdAndUpdate(
+      bookId,
+      { $set: { isPublish: false } },
+      { new: true },
+    );
+
+    // Return the updated book document
+    return this.bookModel.findById(bookId);
+  }
 }

@@ -66,6 +66,16 @@ export class BookController {
     return this.bookService.updateBook(bookId, updateBookDto);
   }
 
+  @Put('/publishBook/:bookId')
+  publishBook(@Param('bookId') bookId: string): Promise<Book> {
+    return this.bookService.publishBook(bookId);
+  }
+
+  @Put('/unpublishBook/:bookId')
+  unpublishBook(@Param('bookId') bookId: string): Promise<Book> {
+    return this.bookService.unpublishBook(bookId);
+  }
+
   @Delete('/deleteBook/:bookId')
   deleteBook(@Param('bookId') bookId: string): Promise<any> {
     return this.bookService.deleteBook(bookId);
