@@ -21,6 +21,9 @@ export class BookService {
       title: createBookDto.title,
     });
 
+    const userId = user._id;
+    console.log(userId);
+
     if (findSameBookTitle) {
       throw new HttpException(
         'Book title already exist',
@@ -30,7 +33,7 @@ export class BookService {
 
     const newBook = await this.bookModel.create({
       ...createBookDto,
-      authorId: user._id,
+      authorId: userId,
     });
 
     return newBook;
@@ -78,6 +81,7 @@ export class BookService {
       .skip(skip)
       .limit(limit)
       .populate('tags')
+      .populate('authorId')
       .populate({
         path: 'chapters',
         options: {
