@@ -29,27 +29,12 @@ export class UpdateBookDto extends PartialType(CreateBookDto) {
   @IsOptional()
   coverImage?: string;
 
-  @ApiProperty({
-    description: 'URL of the author image',
-    example: 'https://i.postimg.cc/jq1v1hhR/image.png',
-    required: false,
-  })
   @IsOptional()
   authorImage?: string;
 
-  @ApiProperty({
-    description: 'The ID of the author',
-    example: '6701646ca74cc28551f85cb8',
-    required: false,
-  })
   @IsOptional()
   authorId?: string;
 
-  @ApiProperty({
-    description: 'The name of the author',
-    example: 'SOW',
-    required: false,
-  })
   @IsOptional()
   authorName?: string;
 
@@ -61,35 +46,15 @@ export class UpdateBookDto extends PartialType(CreateBookDto) {
   @IsOptional()
   tags?: Types.ObjectId[];
 
-  @ApiProperty({
-    description: 'Total number of views',
-    example: 300,
-    required: false,
-  })
   @IsOptional()
   views?: number;
 
-  @ApiProperty({
-    description: 'Total number of votes',
-    example: 100,
-    required: false,
-  })
   @IsOptional()
   totalVotes?: number;
 
-  @ApiProperty({
-    description: 'Total number of positive votes',
-    example: 80,
-    required: false,
-  })
   @IsOptional()
   positiveVote?: number;
 
-  @ApiProperty({
-    description: 'Array of Chapter IDs',
-    example: ['64afc8b0bcf86cd799439013', '64afc8b0bcf86cd799439014'],
-    required: false,
-  })
   @IsOptional()
   chapters?: Types.ObjectId[];
 
