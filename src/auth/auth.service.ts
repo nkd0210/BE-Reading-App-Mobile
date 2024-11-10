@@ -39,8 +39,9 @@ export class AuthService {
 
   async login(user: any) {
     const payload = {
-      username: user.email,
-      sub: user._id,
+      email: user.email,
+      _id: user._id,
+      username: user.name,
     };
 
     const refreshToken = await this.createRefreshToken(payload);
@@ -72,10 +73,11 @@ export class AuthService {
       let user = await this.usersService.findUserByToken(refreshToken);
 
       if (user) {
-        const { _id, email } = user;
+        const { _id, email, name } = user;
         const payload = {
           _id,
           email,
+          username: user.name,
         };
         const userProfile = await this.usersService.getUserProfile(user.email);
 
