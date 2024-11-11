@@ -20,6 +20,7 @@ export class BookService {
     });
 
     const userId = user._id;
+    const authorName = user.username;
     console.log(userId);
 
     if (findSameBookTitle) {
@@ -32,6 +33,7 @@ export class BookService {
     const newBook = await this.bookModel.create({
       ...createBookDto,
       authorId: userId,
+      authorName: authorName,
     });
 
     return newBook;
@@ -334,8 +336,8 @@ export class BookService {
     const userBooks = await this.bookModel
       .find({ authorId: userId, isPublish: false })
       .skip(skip)
-      .limit(limit);
-
+      .limit(limit)
+      .populate('chapters');
     const totalBooks = await this.bookModel.countDocuments({
       authorId: userId,
       isPublish: false,
@@ -365,7 +367,8 @@ export class BookService {
     const userBooks = await this.bookModel
       .find({ authorId: userId, isPublish: true })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .populate('chapters');
 
     const totalBooks = await this.bookModel.countDocuments({
       authorId: userId,
