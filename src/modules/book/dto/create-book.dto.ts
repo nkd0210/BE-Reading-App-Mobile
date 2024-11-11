@@ -27,7 +27,7 @@ export class CreateBookDto {
 
   @IsOptional()
   @IsArray()
-  tags?: Types.ObjectId[];
+  tags?: string[];
 
   @IsOptional()
   views?: number;

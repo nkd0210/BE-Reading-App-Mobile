@@ -40,11 +40,11 @@ export class UpdateBookDto extends PartialType(CreateBookDto) {
 
   @ApiProperty({
     description: 'Array of Genre IDs',
-    example: ['64afc8b0bcf86cd799439010', '64afc8b0bcf86cd799439012'],
+    example: ['Fiction'],
     required: false,
   })
   @IsOptional()
-  tags?: Types.ObjectId[];
+  tags?: string[];
 
   @IsOptional()
   views?: number;
