@@ -4,14 +4,12 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import mongoose, { Model, Types } from 'mongoose';
 import { Book } from './entities/book.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { Genre } from '../genre/entities/genre.entity';
 import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class BookService {
   constructor(
     @InjectModel(Book.name) private bookModel: Model<Book>,
-    @InjectModel(Genre.name) private genreModel: Model<Genre>,
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
@@ -149,11 +147,6 @@ export class BookService {
       throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
     }
 
-    const bookObjectId = new mongoose.Types.ObjectId(bookId);
-    const tagsObjectIds = tags
-      ? tags.map((tag) => new Types.ObjectId(tag))
-      : [];
-
     // Prepare update fields
     const updateFields: any = {};
 
@@ -165,54 +158,7 @@ export class BookService {
     if (positiveVotes) updateFields.positiveVotes = positiveVotes;
     if (coverImage) updateFields.coverImage = coverImage;
     if (isPublish) updateFields.isPublish = isPublish;
-
-    // Set of current tags from the database and new tags from the request
-    const currentTagsSet = new Set(findBook.tags.map((tag) => tag.toString())); // Convert ObjectId to string for comparison
-    const newTagsSet = new Set(tagsObjectIds.map((tag) => tag.toString()));
-
-    // Tags to add and remove
-    const tagsToAdd = [...newTagsSet].filter((tag) => !currentTagsSet.has(tag));
-    const tagsToRemove = [...currentTagsSet].filter(
-      (tag) => !newTagsSet.has(tag),
-    );
-
-    // Handle adding new tags to the book and updating corresponding genres
-    if (tagsToAdd.length > 0) {
-      updateFields.tags = [
-        ...new Set([
-          ...findBook.tags,
-          ...tagsToAdd.map((tag) => new Types.ObjectId(tag)),
-        ]),
-      ];
-
-      await Promise.all(
-        tagsToAdd.map(async (tagId) => {
-          const genre = await this.genreModel.findById(tagId);
-          if (genre && !genre.bookIDs.includes(bookObjectId)) {
-            genre.bookIDs.push(bookObjectId);
-            await genre.save();
-          }
-        }),
-      );
-    }
-
-    // Handle removing old tags from the book and updating corresponding genres
-    if (tagsToRemove.length > 0) {
-      await Promise.all(
-        tagsToRemove.map(async (tagId) => {
-          const genre = await this.genreModel.findById(tagId);
-          if (genre) {
-            genre.bookIDs = genre.bookIDs.filter(
-              (bookId) => !bookId.equals(bookObjectId),
-            );
-            await genre.save();
-          }
-        }),
-      );
-
-      // Update the book's tags to the new set (excluding removed tags)
-      updateFields.tags = tagsObjectIds;
-    }
+    if (tags) updateFields.tags = tags;
 
     // Update the book document with the new fields
     await this.bookModel.findByIdAndUpdate(

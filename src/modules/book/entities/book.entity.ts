@@ -19,15 +19,8 @@ export class Book {
   @Prop()
   authorName: string;
 
-  @Prop({
-    type: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Genre',
-      },
-    ],
-  })
-  tags: Types.ObjectId[];
+  @Prop()
+  tags: string[];
 
   @Prop()
   plot: string;
@@ -51,7 +44,6 @@ export class Book {
 
   @Prop({ default: false })
   isPublish: boolean;
-
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);
