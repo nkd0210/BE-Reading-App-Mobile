@@ -425,7 +425,7 @@ export class BookService {
     }
 
     // Check if the book is already published
-    if (findBook.isPublish) {
+    if (!findBook.isPublish) {
       throw new HttpException('Book is already draft', HttpStatus.BAD_REQUEST);
     }
 
