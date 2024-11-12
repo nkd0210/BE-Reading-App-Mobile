@@ -80,6 +80,7 @@ export class BookService {
       .sort({ views: -1 }) // Sort by views in descending order
       .skip(skip)
       .limit(limit)
+      .find({ isPublish: true })
       .populate('tags')
       .populate('authorId')
       .populate({
