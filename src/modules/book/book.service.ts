@@ -225,7 +225,7 @@ export class BookService {
     const findUser = await this.userModel.findById(userId);
     if (findUser.library.includes(bookObjectId)) {
       throw new HttpException(
-        'Book is already in favourites',
+        'Book is already in library',
         HttpStatus.CONFLICT,
       );
     }
@@ -233,7 +233,7 @@ export class BookService {
     const updatedUser = await this.userModel.findByIdAndUpdate(
       userId,
       {
-        $push: { favourites: bookObjectId },
+        $push: { library: bookObjectId },
       },
       { new: true },
     );
