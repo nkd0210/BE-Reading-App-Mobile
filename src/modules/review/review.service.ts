@@ -64,7 +64,7 @@ export class ReviewService {
     const skip = (page - 1) * limit;
     const allReviewsOfBook = await this.reviewModel
       .find({ book: bookId })
-      .populate('user book')
+      // .populate('userId')
       .skip(skip)
       .limit(limit)
       .exec();
@@ -107,14 +107,14 @@ export class ReviewService {
     reviewId: string,
     updateReviewDto: UpdateReviewDto,
   ): Promise<Review> {
-    const { vote, comment } = updateReviewDto;
+    const { positive, review } = updateReviewDto;
 
     const updatedReview = await this.reviewModel.findByIdAndUpdate(
       reviewId,
       {
         $set: {
-          vote,
-          comment,
+          positive,
+          review,
         },
       },
       { new: true },

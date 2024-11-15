@@ -3,10 +3,9 @@ import { CreateReviewDto } from './create-review.dto';
 import { IsOptional } from 'class-validator';
 
 export class UpdateReviewDto extends PartialType(CreateReviewDto) {
+  @IsOptional()
+  positive: boolean;
 
-    @IsOptional()
-    vote: boolean;
-
-    @IsOptional()
-    comment: string;
+  @IsOptional()
+  review: string;
 }
