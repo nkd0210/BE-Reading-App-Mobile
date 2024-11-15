@@ -48,7 +48,7 @@ export class User {
       },
     ],
   })
-  favourites: Types.ObjectId[];
+  library: Types.ObjectId[];
 
   @Prop({
     type: [
@@ -64,11 +64,11 @@ export class User {
     type: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'ReadingProgress',
+        ref: 'Book',
       },
     ],
   })
-  readingProgress: ReadingProgress[];
+  reviewList: Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

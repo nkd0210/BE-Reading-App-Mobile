@@ -113,12 +113,13 @@ export class BookController {
     return this.bookService.deleteBook(bookId);
   }
 
-  @Put('/addToFavorites/:userId/:bookId')
-  addToFavorites(
-    @Param('userId') userId: string,
+  @Put('/addToLibrary/:bookId')
+  addToLibrary(
+    @Request() req: any,
     @Param('bookId') bookId: string,
   ): Promise<any> {
-    return this.bookService.addToFavorites(userId, bookId);
+    const userId = req.user._id;
+    return this.bookService.addToLibrary(userId, bookId);
   }
 
   @Put('/removeFromFavorites/:userId/:bookId')

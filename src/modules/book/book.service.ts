@@ -214,7 +214,7 @@ export class BookService {
   }
 
   // thêm sách vào danh sách yêu thích
-  async addToFavorites(userId: string, bookId: string): Promise<any> {
+  async addToLibrary(userId: string, bookId: string): Promise<any> {
     const findBook = await this.bookModel.findById(bookId);
     const bookObjectId = new Types.ObjectId(bookId);
 
@@ -223,7 +223,7 @@ export class BookService {
     }
 
     const findUser = await this.userModel.findById(userId);
-    if (findUser.favourites.includes(bookObjectId)) {
+    if (findUser.library.includes(bookObjectId)) {
       throw new HttpException(
         'Book is already in favourites',
         HttpStatus.CONFLICT,
@@ -251,7 +251,7 @@ export class BookService {
     }
 
     const findUser = await this.userModel.findById(userId);
-    if (!findUser.favourites.includes(bookObjectId)) {
+    if (!findUser.library.includes(bookObjectId)) {
       throw new HttpException('Book is not in favourites', HttpStatus.CONFLICT);
     }
 
