@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsOptional, IsArray } from 'class-validator';
 import { Types } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
+import { TagsType } from '../enum/tags.enum';
 
 export class CreateBookDto {
   @ApiProperty({
@@ -26,8 +27,7 @@ export class CreateBookDto {
   authorName: string;
 
   @IsOptional()
-  @IsArray()
-  tags?: string[];
+  tags?: TagsType;
 
   @IsOptional()
   views?: number;

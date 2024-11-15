@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Genre } from 'src/modules/genre/entities/genre.entity';
 import { Chapter } from 'src/modules/chapter/entities/chapter.entity';
+import { TagsType } from '../enum/tags.enum';
 
 export type BookDocument = HydratedDocument<Book>;
 
@@ -19,8 +20,8 @@ export class Book {
   @Prop()
   authorName: string;
 
-  @Prop()
-  tags: string[];
+  @Prop({ type: [String], enum: TagsType }) // Use enum with an array of strings
+  tags: TagsType[];
 
   @Prop()
   plot: string;

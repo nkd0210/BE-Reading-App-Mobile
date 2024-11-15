@@ -3,6 +3,7 @@ import { CreateBookDto } from './create-book.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { IsOptional } from 'class-validator';
+import { TagsType } from '../enum/tags.enum';
 
 export class UpdateBookDto extends PartialType(CreateBookDto) {
   @ApiProperty({
@@ -39,12 +40,11 @@ export class UpdateBookDto extends PartialType(CreateBookDto) {
   authorName?: string;
 
   @ApiProperty({
-    description: 'Array of Genre IDs',
     example: ['Fiction'],
     required: false,
   })
   @IsOptional()
-  tags?: string[];
+  tags?: TagsType;
 
   @IsOptional()
   views?: number;

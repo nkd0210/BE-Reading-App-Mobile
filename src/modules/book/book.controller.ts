@@ -19,7 +19,7 @@ import { Types } from 'mongoose';
 import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { Public } from 'src/decorator/customize';
 import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
-
+import { TagsType } from './enum/tags.enum';
 @ApiBearerAuth('JWT-auth')
 @ApiTags('book')
 @Controller('book')
@@ -52,13 +52,19 @@ export class BookController {
     name: 'keyword',
     required: false,
     type: String,
-  }) // Make keyword optional
+  })
+  @ApiQuery({
+    name: 'tags',
+    required: false,
+    enum: TagsType, // Use the Tags enum here
+  })
   async getAllBooks(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('keyword') keyword: string = '',
+    @Query('tags') tags?: TagsType,
   ): Promise<any> {
-    return this.bookService.getAllBooks(page, limit, keyword);
+    return this.bookService.getAllBooks(page, limit, keyword, tags);
   }
 
   @Public()

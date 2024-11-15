@@ -5,6 +5,7 @@ import mongoose, { Model, Types } from 'mongoose';
 import { Book } from './entities/book.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../users/entities/user.entity';
+import { TagsType } from './enum/tags.enum';
 
 @Injectable()
 export class BookService {
@@ -44,20 +45,27 @@ export class BookService {
     page: number,
     limit: number,
     keyword: string,
+    tags: TagsType,
   ): Promise<any> {
     const skip = (page - 1) * limit;
 
-    let searchQuery: Record<string, any> = { isPublish: true }; // Use Record<string, any> to allow MongoDB operators
+    let searchQuery: Record<string, any> = { isPublish: true };
 
     if (keyword) {
-      // If keyword is not empty, apply the keyword search
       searchQuery = {
         ...searchQuery,
-        $or: [
-          { title: { $regex: keyword, $options: 'i' } }, // Case-insensitive search in title
-        ],
+        $or: [{ title: { $regex: keyword, $options: 'i' } }],
       };
     }
+
+    if (tags) {
+      searchQuery = {
+        ...searchQuery,
+        tags: { $in: [tags] }, // Ensure `tags` is queried as an array
+      };
+    }
+
+    console.log(tags);
 
     const allBooks = await this.bookModel
       .find(searchQuery)
