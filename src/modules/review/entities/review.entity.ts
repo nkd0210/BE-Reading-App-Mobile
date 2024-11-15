@@ -7,18 +7,17 @@ export type UserDocument = HydratedDocument<Review>;
 
 @Schema({ timestamps: true })
 export class Review {
-    
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-    user: User;
-  
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true })
-    book: Book;
-  
-    @Prop({ required: true })
-    vote: boolean;
-  
-    @Prop()
-    comment: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+  userId: User;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true })
+  book: Book;
+
+  @Prop({ required: true })
+  positive: boolean;
+
+  @Prop()
+  review: string;
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);

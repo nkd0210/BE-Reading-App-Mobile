@@ -5,23 +5,27 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Review } from './entities/review.entity';
 import { Model } from 'mongoose';
 import { Book } from '../book/entities/book.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class ReviewService {
   constructor(
     @InjectModel(Review.name) private reviewModel: Model<Review>,
     @InjectModel(Book.name) private bookModel: Model<Book>,
-  ) { }
+  ) {}
 
   // tạo review
-  async createReview(createReviewDto: CreateReviewDto): Promise<Review> {
-    const { user, book, vote, comment } = createReviewDto;
-
+  async createReview(
+    createReviewDto: CreateReviewDto,
+    user: any,
+  ): Promise<Review> {
+    const { book, positive, review } = createReviewDto;
+    const userId = user._id;
     const newReview = await this.reviewModel.create({
-      user,
+      userId: userId,
       book,
-      vote,
-      comment
+      positive,
+      review,
     });
 
     return newReview;
@@ -31,10 +35,13 @@ export class ReviewService {
   async getAllReviews(page: number, limit: number): Promise<any> {
     const skip = (page - 1) * limit;
 
-    const allReviews = await this.reviewModel.find().populate('user book').exec();
+    const allReviews = await this.reviewModel
+      .find()
+      .populate('user book')
+      .exec();
 
     if (!allReviews) {
-      throw new HttpException("No reviews found", HttpStatus.NOT_FOUND)
+      throw new HttpException('No reviews found', HttpStatus.NOT_FOUND);
     }
 
     const totalReviews = await this.reviewModel.countDocuments();
@@ -44,49 +51,62 @@ export class ReviewService {
       totalReviews,
       page,
       totalPages,
-      allReviews
-    }
+      allReviews,
+    };
   }
 
   // lấy tất cả reviews của 1 cuốn sách
-  async getBookReviews(bookId: string, page: number, limit: number): Promise<any> {
-
+  async getBookReviews(
+    bookId: string,
+    page: number,
+    limit: number,
+  ): Promise<any> {
     const skip = (page - 1) * limit;
-    const allReviewsOfBook = await this.reviewModel.find({ book: bookId })
+    const allReviewsOfBook = await this.reviewModel
+      .find({ book: bookId })
       .populate('user book')
       .skip(skip)
       .limit(limit)
       .exec();
 
     if (!allReviewsOfBook) {
-      throw new HttpException("No reviews found for this book", HttpStatus.NOT_FOUND)
+      throw new HttpException(
+        'No reviews found for this book',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
-    const totalReviewsOfBook = await this.reviewModel.countDocuments({ book: bookId }).exec();
+    const totalReviewsOfBook = await this.reviewModel
+      .countDocuments({ book: bookId })
+      .exec();
     const totalPages = Math.ceil(totalReviewsOfBook / limit);
 
     return {
       totalReviewsOfBook,
       page,
       totalPages,
-      allReviewsOfBook
-    }
-
+      allReviewsOfBook,
+    };
   }
 
   // lấy từng review
   async getEachReview(reviewId: string): Promise<Review> {
-    const findReview = await this.reviewModel.findById(reviewId).populate('user book');
+    const findReview = await this.reviewModel
+      .findById(reviewId)
+      .populate('user book');
 
     if (!findReview) {
-      throw new HttpException("Review not found", HttpStatus.NOT_FOUND)
+      throw new HttpException('Review not found', HttpStatus.NOT_FOUND);
     }
 
     return findReview;
   }
 
   // cập nhật review
-  async updateReview(reviewId: string, updateReviewDto: UpdateReviewDto): Promise<Review> {
+  async updateReview(
+    reviewId: string,
+    updateReviewDto: UpdateReviewDto,
+  ): Promise<Review> {
     const { vote, comment } = updateReviewDto;
 
     const updatedReview = await this.reviewModel.findByIdAndUpdate(
@@ -94,11 +114,11 @@ export class ReviewService {
       {
         $set: {
           vote,
-          comment
-        }
+          comment,
+        },
       },
-      { new: true }
-    )
+      { new: true },
+    );
 
     if (!updatedReview) {
       throw new HttpException('Review not found', HttpStatus.NOT_FOUND);
@@ -113,11 +133,13 @@ export class ReviewService {
       await this.reviewModel.findByIdAndUpdate(reviewId);
 
       return {
-        message: "Review deleted successfully"
-      }
+        message: 'Review deleted successfully',
+      };
     } catch (error) {
-      throw new HttpException("Review deleted failed", HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        'Review deleted failed',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
-
 }

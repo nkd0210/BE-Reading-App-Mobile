@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  Request,
   Put,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
@@ -22,8 +23,12 @@ export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @Post('/createReview')
-  createReview(@Body() createReviewDto: CreateReviewDto): Promise<Review> {
-    return this.reviewService.createReview(createReviewDto);
+  createReview(
+    @Request() req: any,
+    @Body() createReviewDto: CreateReviewDto,
+  ): Promise<Review> {
+    const user = req.user;
+    return this.reviewService.createReview(createReviewDto, user);
   }
 
   @Get('/getAllReviews')
