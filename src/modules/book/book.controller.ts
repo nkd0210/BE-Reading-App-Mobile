@@ -16,7 +16,7 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from './entities/book.entity';
 import { Types } from 'mongoose';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { Public } from 'src/decorator/customize';
 import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 
@@ -36,12 +36,29 @@ export class BookController {
     return this.bookService.createBook(createBookDto, user);
   }
 
+  @Public()
   @Get('getAllBooks')
-  getAllBooks(
+  @ApiQuery({
+    name: 'page',
+    required: true,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: true,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'keyword',
+    required: false,
+    type: String,
+  }) // Make keyword optional
+  async getAllBooks(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('keyword') keyword: string = '',
   ): Promise<any> {
-    return this.bookService.getAllBooks(page, limit);
+    return this.bookService.getAllBooks(page, limit, keyword);
   }
 
   @Public()

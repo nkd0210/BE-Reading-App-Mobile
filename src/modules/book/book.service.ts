@@ -40,11 +40,27 @@ export class BookService {
   }
 
   // lấy hết tất cả các sách
-  async getAllBooks(page: number, limit: number): Promise<any> {
+  async getAllBooks(
+    page: number,
+    limit: number,
+    keyword: string,
+  ): Promise<any> {
     const skip = (page - 1) * limit;
 
+    let searchQuery: Record<string, any> = { isPublish: true }; // Use Record<string, any> to allow MongoDB operators
+
+    if (keyword) {
+      // If keyword is not empty, apply the keyword search
+      searchQuery = {
+        ...searchQuery,
+        $or: [
+          { title: { $regex: keyword, $options: 'i' } }, // Case-insensitive search in title
+        ],
+      };
+    }
+
     const allBooks = await this.bookModel
-      .find()
+      .find(searchQuery)
       .skip(skip)
       .limit(limit)
       .populate('tags')
@@ -56,7 +72,7 @@ export class BookService {
       })
       .exec();
 
-    const totalBooks = await this.bookModel.countDocuments();
+    const totalBooks = await this.bookModel.countDocuments(searchQuery);
     const totalPages = Math.ceil(totalBooks / limit);
 
     if (allBooks.length === 0) {
