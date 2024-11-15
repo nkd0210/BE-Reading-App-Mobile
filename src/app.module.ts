@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './modules/users/users.module';
 import { ReviewModule } from './modules/review/review.module';
-import { ReadingProgressModule } from './modules/reading-progress/reading-progress.module';
+// import { ReadingProgressModule } from './modules/reading-progress/reading-progress.module';
 import { GenreModule } from './modules/genre/genre.module';
 import { ChapterModule } from './modules/chapter/chapter.module';
 import { BookModule } from './modules/book/book.module';
@@ -14,14 +14,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
 
-
 @Module({
   imports: [
-    BookModule, 
-    ChapterModule, 
-    GenreModule, 
-    ReadingProgressModule, 
-    ReviewModule, 
+    BookModule,
+    ChapterModule,
+    GenreModule,
+    // ReadingProgressModule,
+    ReviewModule,
     UsersModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
@@ -32,7 +31,6 @@ import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
       inject: [ConfigService],
     }),
     AuthModule,
-  
   ],
   controllers: [AppController],
   providers: [
