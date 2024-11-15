@@ -7,7 +7,7 @@ export class CreateReviewDto {
     example: '6736e7dc867869cccd65fb27', // Example book ID
   })
   @IsNotEmpty()
-  book: string;
+  bookId: string;
 
   @ApiProperty({
     description: 'Indicates if the review is positive',

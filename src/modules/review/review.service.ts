@@ -11,7 +11,7 @@ import { User } from '../users/entities/user.entity';
 export class ReviewService {
   constructor(
     @InjectModel(Review.name) private reviewModel: Model<Review>,
-    @InjectModel(Book.name) private bookModel: Model<Book>,
+    @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
   // tạo review
@@ -19,14 +19,22 @@ export class ReviewService {
     createReviewDto: CreateReviewDto,
     user: any,
   ): Promise<Review> {
-    const { book, positive, review } = createReviewDto;
+    const { bookId, positive, review } = createReviewDto;
     const userId = user._id;
+
+    // Create a new review
     const newReview = await this.reviewModel.create({
-      userId: userId,
-      book,
+      userId,
+      bookId,
       positive,
       review,
     });
+
+    await this.userModel.findByIdAndUpdate(
+      userId,
+      { $addToSet: { reviewList: bookId } },
+      { new: true },
+    );
 
     return newReview;
   }
@@ -63,7 +71,7 @@ export class ReviewService {
   ): Promise<any> {
     const skip = (page - 1) * limit;
     const allReviewsOfBook = await this.reviewModel
-      .find({ book: bookId })
+      .find({ bookId })
       // .populate('userId')
       .skip(skip)
       .limit(limit)
@@ -77,7 +85,7 @@ export class ReviewService {
     }
 
     const totalReviewsOfBook = await this.reviewModel
-      .countDocuments({ book: bookId })
+      .countDocuments({ bookId })
       .exec();
     const totalPages = Math.ceil(totalReviewsOfBook / limit);
 

@@ -11,7 +11,7 @@ export class Review {
   userId: User;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true })
-  book: Book;
+  bookId: Book;
 
   @Prop({ required: true })
   positive: boolean;

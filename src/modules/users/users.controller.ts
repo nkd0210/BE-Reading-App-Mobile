@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   Query,
-  UseGuards,
+  Request,
   Put,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -48,5 +48,15 @@ export class UsersController {
   @Delete('/deleteUser/:userId')
   deleteUser(@Param('userId') userId: string): Promise<any> {
     return this.usersService.deleteUser(userId);
+  }
+
+  @Get(':bookId/hasReview')
+  async hasReviewedBook(
+    @Param('bookId') bookId: string,
+    @Request() req: any,
+  ): Promise<{ hasReviewed: boolean }> {
+    const userId = req.user._id;
+    const hasReviewed = await this.usersService.hasReviewedBook(userId, bookId);
+    return { hasReviewed };
   }
 }

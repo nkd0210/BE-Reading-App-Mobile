@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './entities/user.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { hashPasswordUtils } from 'src/utils/util';
 
 @Injectable()
@@ -189,5 +189,26 @@ export class UsersService {
 
   async findUserByGoogleId(googleId: string) {
     return this.userModel.findOne({ googleId });
+  }
+
+  async hasReviewedBook(userId: string, bookId: string): Promise<boolean> {
+    // Convert bookId to ObjectId
+    const bookObjectId = new Types.ObjectId(bookId);
+
+    // Find the user by userId and select only the reviewList field
+    const user = await this.userModel
+      .findById(userId)
+      .select('reviewList')
+      .exec();
+
+    // Check if user or reviewList exists
+    if (!user || !user.reviewList) {
+      return false;
+    }
+
+    // Check if bookObjectId exists in reviewList
+    const hasReviewed = user.reviewList.includes(bookObjectId);
+
+    return hasReviewed;
   }
 }
