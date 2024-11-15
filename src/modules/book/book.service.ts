@@ -464,4 +464,40 @@ export class BookService {
     // Return the updated book document
     return this.bookModel.findById(bookId);
   }
+
+  async getRandomBooks(page: number, limit: number): Promise<any> {
+    // Ensure limit is a valid positive integer
+
+    const skip = (page - 1) * limit;
+
+    // Count the total published books
+    const totalBooks = await this.bookModel.countDocuments({ isPublish: true });
+    const totalPages = Math.ceil(totalBooks / limit);
+
+    const randomSkip = Math.floor(Math.random() * totalBooks);
+
+    // Retrieve books with random sorting
+    const randomBooks = await this.bookModel
+      .find({ isPublish: true })
+      .skip(randomSkip)
+      .limit(limit)
+      .populate('tags')
+      .populate('authorId')
+      .populate({
+        path: 'chapters',
+        options: { sort: { chapterNumber: 1 } },
+      })
+      .exec();
+
+    if (randomBooks.length === 0) {
+      throw new HttpException('No books found', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      totalBooks,
+      page,
+      totalPages,
+      randomBooks,
+    };
+  }
 }
