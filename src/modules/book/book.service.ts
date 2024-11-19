@@ -322,6 +322,31 @@ export class BookService {
     return updatedUser;
   }
 
+  // xóa sách khỏi danh sách đang đọc
+  async removeFromLibrary(userId: string, bookId: string): Promise<any> {
+    const findBook = await this.bookModel.findById(bookId);
+    const bookObjectId = new Types.ObjectId(bookId);
+
+    if (!findBook) {
+      throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
+    }
+
+    const findUser = await this.userModel.findById(userId);
+    if (!findUser.readingList.includes(bookObjectId)) {
+      throw new HttpException('Book is not in library', HttpStatus.CONFLICT);
+    }
+
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $pull: { readingList: bookObjectId },
+      },
+      { new: true },
+    );
+
+    return updatedUser;
+  }
+
   async getAllUserBooks(
     userId: string,
     page: number,
@@ -467,26 +492,20 @@ export class BookService {
 
   async getRandomBooks(page: number, limit: number): Promise<any> {
     // Ensure limit is a valid positive integer
-
     const skip = (page - 1) * limit;
 
     // Count the total published books
     const totalBooks = await this.bookModel.countDocuments({ isPublish: true });
     const totalPages = Math.ceil(totalBooks / limit);
 
-    const randomSkip = Math.floor(Math.random() * totalBooks);
-
-    // Retrieve books with random sorting
+    // Retrieve books in random order
     const randomBooks = await this.bookModel
       .find({ isPublish: true })
-      .skip(randomSkip)
+      .sort({ $natural: Math.random() > 0.5 ? 1 : -1 }) // Randomizes the order
+      .skip(skip)
       .limit(limit)
       .populate('tags')
       .populate('authorId')
-      .populate({
-        path: 'chapters',
-        options: { sort: { chapterNumber: 1 } },
-      })
       .exec();
 
     if (randomBooks.length === 0) {

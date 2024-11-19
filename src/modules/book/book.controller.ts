@@ -122,13 +122,15 @@ export class BookController {
     return this.bookService.addToLibrary(userId, bookId);
   }
 
-  // @Put('/removeFromLibrary/:userId/:bookId')
-  // removeFromFavorites(
-  //   @Param('userId') userId: string,
-  //   @Param('bookId') bookId: string,
-  // ): Promise<any> {
-  //   return this.bookService.removeFromFavorites(userId, bookId);
-  // }
+  @Put('/removeFromLibrary/:bookId')
+  removeFromLibrary(
+    @Request() req: any,
+    @Param('bookId') bookId: string,
+  ): Promise<any> {
+    const userId = req.user._id;
+
+    return this.bookService.removeFromLibrary(userId, bookId);
+  }
 
   @Put('/addToReadingList/:bookId')
   addToReadingList(
@@ -139,11 +141,12 @@ export class BookController {
     return this.bookService.addToReadingList(userId, bookId);
   }
 
-  @Put('/removeFromReadingList/:userId/:bookId')
+  @Put('/removeFromReadingList/:bookId')
   removeFromReadingList(
-    @Param('userId') userId: string,
+    @Request() req: any,
     @Param('bookId') bookId: string,
   ): Promise<any> {
+    const userId = req.user._id;
     return this.bookService.removeFromReadingList(userId, bookId);
   }
 
