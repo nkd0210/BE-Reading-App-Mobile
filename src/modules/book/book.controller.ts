@@ -179,4 +179,10 @@ export class BookController {
     const userId = req.user._id;
     return this.bookService.getAllUserDraftBooks(userId, page, limit);
   }
+
+  @Public()
+  @Put('/increaseView/:bookId')
+  increaseView(@Param('bookId') bookId: string): Promise<Book> {
+    return this.bookService.increaseView(bookId);
+  }
 }

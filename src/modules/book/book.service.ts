@@ -519,4 +519,14 @@ export class BookService {
       randomBooks,
     };
   }
+
+  async increaseView(bookId: string): Promise<Book> {
+    const findBook = await this.bookModel.findById(bookId);
+    if (!findBook) {
+      throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
+    }
+    findBook.views = (findBook.views || 0) + 1;
+    await findBook.save();
+    return findBook;
+  }
 }
