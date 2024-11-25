@@ -136,6 +136,7 @@ export class BookService {
       .findById(bookId)
       .populate({
         path: 'chapters',
+        select: '-content', // Exclude the 'content' field
         options: {
           sort: { chapterNumber: 1 },
         },
