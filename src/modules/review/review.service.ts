@@ -12,6 +12,7 @@ export class ReviewService {
   constructor(
     @InjectModel(Review.name) private reviewModel: Model<Review>,
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Book.name) private bookModel: Model<Book>,
   ) {}
 
   // tạo review
@@ -35,6 +36,13 @@ export class ReviewService {
       { $addToSet: { reviewList: bookId } },
       { new: true },
     );
+
+    const updateFields: Record<string, any> = { $inc: { totalVotes: 1 } };
+    if (positive) {
+      updateFields.$inc.positiveVotes = 1;
+    }
+
+    await this.bookModel.findByIdAndUpdate(bookId, updateFields, { new: true });
 
     return newReview;
   }
@@ -72,7 +80,10 @@ export class ReviewService {
     const skip = (page - 1) * limit;
     const allReviewsOfBook = await this.reviewModel
       .find({ bookId })
-      // .populate('userId')
+      .populate({
+        path: 'userId',
+        select: '_id name',
+      })
       .skip(skip)
       .limit(limit)
       .exec();
