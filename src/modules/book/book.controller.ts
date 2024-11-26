@@ -86,8 +86,12 @@ export class BookController {
   }
 
   @Get('/getSingleBook/:bookId')
-  getSingleBook(@Param('bookId') bookId: string): Promise<Book> {
-    return this.bookService.getSingleBook(bookId);
+  getSingleBook(
+    @Request() req: any,
+    @Param('bookId') bookId: string,
+  ): Promise<Book> {
+    const userId = req.user._id;
+    return this.bookService.getSingleBook(bookId, userId);
   }
 
   @Put('/updateBook/:bookId')

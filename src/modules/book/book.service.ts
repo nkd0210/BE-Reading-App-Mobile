@@ -131,9 +131,11 @@ export class BookService {
   }
 
   // lấy từng sách
-  async getSingleBook(bookId: string): Promise<Book> {
+  async getSingleBook(bookId: string, userId: string): Promise<any> {
+    // Find the book and populate required fields
     const findBook = await this.bookModel
       .findById(bookId)
+      .lean() // Use lean for better performance
       .populate({
         path: 'chapters',
         select: '-content', // Exclude the 'content' field
@@ -143,11 +145,25 @@ export class BookService {
       })
       .populate('tags')
       .exec();
+
+    // Handle if book is not found
     if (!findBook) {
       throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
     }
 
-    return findBook;
+    // Find the user
+    const findUser = await this.userModel.findById(userId).exec();
+    // Handle if user is not found
+    if (!findUser) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Return the book data with the dynamic boolean fields for inLibrary and inReadingList
+    return {
+      ...findBook,
+      inLibrary: findUser.library.some((id) => id.equals(bookId)),
+      inReadingList: findUser.readingList.some((id) => id.equals(bookId)),
+    };
   }
 
   // cập nhật sách
