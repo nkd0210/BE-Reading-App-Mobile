@@ -240,20 +240,32 @@ export class BookService {
     }
 
     const findUser = await this.userModel.findById(userId);
-    if (findUser.library.includes(bookObjectId)) {
-      throw new HttpException(
-        'Book is already in library',
-        HttpStatus.CONFLICT,
+
+    // Check if the book is already in the library
+    const isBookInLibrary = findUser.library.some((id) =>
+      id.equals(bookObjectId),
+    );
+
+    let updatedUser;
+    if (isBookInLibrary) {
+      // Remove the book from the library
+      updatedUser = await this.userModel.findByIdAndUpdate(
+        userId,
+        {
+          $pull: { library: bookObjectId },
+        },
+        { new: true },
+      );
+    } else {
+      // Add the book to the library
+      updatedUser = await this.userModel.findByIdAndUpdate(
+        userId,
+        {
+          $push: { library: bookObjectId },
+        },
+        { new: true },
       );
     }
-
-    const updatedUser = await this.userModel.findByIdAndUpdate(
-      userId,
-      {
-        $push: { library: bookObjectId },
-      },
-      { new: true },
-    );
 
     return updatedUser;
   }
@@ -293,20 +305,32 @@ export class BookService {
     }
 
     const findUser = await this.userModel.findById(userId);
-    if (findUser.readingList.includes(bookObjectId)) {
-      throw new HttpException(
-        'Book is already in reading list',
-        HttpStatus.CONFLICT,
+
+    // Check if the book is already in the reading list
+    const isBookInReadingList = findUser.readingList.some((id) =>
+      id.equals(bookObjectId),
+    );
+
+    let updatedUser;
+    if (isBookInReadingList) {
+      // Remove the book from the reading list
+      updatedUser = await this.userModel.findByIdAndUpdate(
+        userId,
+        {
+          $pull: { readingList: bookObjectId },
+        },
+        { new: true },
+      );
+    } else {
+      // Add the book to the reading list
+      updatedUser = await this.userModel.findByIdAndUpdate(
+        userId,
+        {
+          $push: { readingList: bookObjectId },
+        },
+        { new: true },
       );
     }
-
-    const updatedUser = await this.userModel.findByIdAndUpdate(
-      userId,
-      {
-        $push: { readingList: bookObjectId },
-      },
-      { new: true },
-    );
 
     return updatedUser;
   }
@@ -545,5 +569,75 @@ export class BookService {
     findBook.views = (findBook.views || 0) + 1;
     await findBook.save();
     return findBook;
+  }
+
+  async getUserReadingList(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<any> {
+    const skip = (page - 1) * limit;
+
+    // Retrieve user's reading list from the User model
+    const user = await this.userModel
+      .findById(userId)
+      .select('readingList')
+      .populate({
+        path: 'readingList',
+        model: 'Book',
+        options: { skip, limit },
+      });
+
+    if (!user || user.readingList.length === 0) {
+      throw new HttpException(
+        'No books found in your reading list',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const totalBooks = user.readingList.length; // Total books in reading list
+    const totalPages = Math.ceil(totalBooks / limit);
+
+    return {
+      totalBooks,
+      page,
+      totalPages,
+      readingList: user.readingList,
+    };
+  }
+
+  async getUserLibrary(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<any> {
+    const skip = (page - 1) * limit;
+
+    // Retrieve user's library from the User model
+    const user = await this.userModel
+      .findById(userId)
+      .select('library')
+      .populate({
+        path: 'library',
+        model: 'Book',
+        options: { skip, limit },
+      });
+
+    if (!user || user.library.length === 0) {
+      throw new HttpException(
+        'No books found in your library',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const totalBooks = user.library.length; // Total books in library
+    const totalPages = Math.ceil(totalBooks / limit);
+
+    return {
+      totalBooks,
+      page,
+      totalPages,
+      library: user.library,
+    };
   }
 }

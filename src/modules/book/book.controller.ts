@@ -184,6 +184,26 @@ export class BookController {
     return this.bookService.getAllUserDraftBooks(userId, page, limit);
   }
 
+  @Get('/getUserReadingList')
+  getUserReadingList(
+    @Request() req: any,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<any> {
+    const userId = req.user._id;
+    return this.bookService.getUserReadingList(userId, page, limit);
+  }
+
+  @Get('/getUserLibrary')
+  getUserLibrary(
+    @Request() req: any,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<any> {
+    const userId = req.user._id;
+    return this.bookService.getUserLibrary(userId, page, limit);
+  }
+
   @Public()
   @Put('/increaseView/:bookId')
   increaseView(@Param('bookId') bookId: string): Promise<Book> {
