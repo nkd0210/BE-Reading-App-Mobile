@@ -252,7 +252,9 @@ export class BookService {
       updatedUser = await this.userModel.findByIdAndUpdate(
         userId,
         {
-          $pull: { library: bookObjectId },
+          $pull: {
+            library: bookObjectId,
+          },
         },
         { new: true },
       );
@@ -262,6 +264,7 @@ export class BookService {
         userId,
         {
           $push: { library: bookObjectId },
+          $pull: { readingList: bookObjectId },
         },
         { new: true },
       );
@@ -327,6 +330,7 @@ export class BookService {
         userId,
         {
           $push: { readingList: bookObjectId },
+          $pull: { library: bookObjectId },
         },
         { new: true },
       );
