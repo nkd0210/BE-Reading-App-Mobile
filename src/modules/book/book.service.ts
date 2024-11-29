@@ -384,7 +384,7 @@ export class BookService {
     const updatedUser = await this.userModel.findByIdAndUpdate(
       userId,
       {
-        $pull: { readingList: bookObjectId },
+        $pull: { library: bookObjectId },
       },
       { new: true },
     );
