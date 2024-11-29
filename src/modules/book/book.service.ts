@@ -377,7 +377,7 @@ export class BookService {
     }
 
     const findUser = await this.userModel.findById(userId);
-    if (!findUser.readingList.includes(bookObjectId)) {
+    if (!findUser.library.includes(bookObjectId)) {
       throw new HttpException('Book is not in library', HttpStatus.CONFLICT);
     }
 
